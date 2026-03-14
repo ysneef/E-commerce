@@ -2,11 +2,11 @@
 
 ## Introduction
 
-This project is a full-stack **E-commerce Web Application** that allows users to browse products, manage shopping carts, place orders, and manage accounts.
+This project is a full-stack E-commerce Web Application that allows users to browse products, manage shopping carts, place orders, and manage accounts.
 
-The system also includes an **Admin Dashboard** for managing products, users, and orders.
+The system also includes an Admin Dashboard for managing products, users, and orders.
 
-The project is built using **modern web technologies** and follows a **monorepo architecture with Turborepo**.
+The project is built using modern web technologies and follows a monorepo architecture with Turborepo.
 
 ---
 
