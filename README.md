@@ -1,4 +1,4 @@
-# E-Commerce Web Application
+# E-Commerce ShoesStore
 
 ## Introduction
 
