@@ -106,14 +106,14 @@ npm run dev
 
 ## Environment Variables
 
-Create a `.env` file on apps/api:
+Create a `.env` file on `apps/api`:
 
 ```
 PORT=3001
 CONNECTION_STRING=mongodb+srv://<username>:<password>@cluster.mongodb.net/
 DB_DATABASE=shoppingonline
 ```
-Ensure you have MongoDB installed and running on your computer, and update the connection URL in the apps\api\utils\MyConstants.js file.
+Ensure you have MongoDB installed and running on your computer, and update the connection URL in the `apps\api\utils\MyConstants.js` file.
 
 ```
 const MyConstants = {
