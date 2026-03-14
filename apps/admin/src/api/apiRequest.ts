@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const API_BASE_URL = "https://e-commerce-api-red.vercel.app/"
+
 export interface AxiosRequestProps {
   data: {
     endpoint: string;
