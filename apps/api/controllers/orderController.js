@@ -1,0 +1,184 @@
+import orderModel from "../models/orderModel.js";
+import { productModel } from "../models/productModel.js";
+import userModel from "../models/userModel.js";
+import BaseController from "./BaseController.js";
+
+export const createOrder = async (req, res) => {
+  try {
+    const { userId, items, shippingAddress, paymentMethod } = req.body;
+
+    if (!items || items.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Product list cannot be empty!",
+      });
+    }
+
+    const userInfo = await userModel.findById(userId);
+    if (!userInfo) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User does not exist!" });
+    }
+
+    let totalPrice = 0;
+    let totalDiscount = 0;
+    const processedItems = [];
+
+    for (const item of items) {
+      const product = await productModel.findById(item.productId);
+
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: `Product ${item.productId} does not exist!`,
+        });
+      }
+
+      if (!product.sizes.includes(item.size)) {
+        return res.status(400).json({
+          success: false,
+          message: `Size ${item.size} is not valid for product ${product.name}!`,
+        });
+      }
+
+      const discountAmount = (product.price * product.discountPercent) / 100;
+      const discountedPrice = product.price - discountAmount;
+      const itemTotal = discountedPrice * item.quantity;
+
+      totalPrice += itemTotal;
+      totalDiscount += discountAmount * item.quantity;
+
+      processedItems.push({
+        _id: product._id,
+        name: product.name,
+        image: product.image,
+        quantity: item.quantity,
+        discountPercent: product.discountPercent,
+        discountPrice: product.discountPrice,
+        price: product.price * item.quantity,
+        totalPrice: itemTotal,
+        size: item.size,
+      });
+    }
+    console.log("🚀 ~ createOrder ~ processedItems:", processedItems);
+
+    const newOrder = await orderModel.create({
+      user: {
+        _id: userInfo._id,
+        phone: userInfo.phone,
+        userName: userInfo.userName,
+        email: userInfo.email,
+        avatar: userInfo.avatar,
+      },
+      items: processedItems,
+      totalPrice,
+      discount: totalDiscount,
+      shippingAddress,
+      paymentMethod,
+    });
+
+    if(newOrder){
+      userInfo.order.push(newOrder._id);
+      userInfo.cart = [];
+      await userInfo.save();
+    }
+
+    res.status(201).json({ success: true, data: newOrder });
+  } catch (error) {
+    res.status(200).json({
+      success: false,
+      message: "Error while creating order",
+      error: error.message,
+    });
+  }
+};
+
+export const updateOrder = async (req, res) => {
+  try {
+    const updatedOrder = await orderModel.updateById(req.params.id, req.body);
+
+    if (!updatedOrder) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order does not exist" });
+    }
+
+    res.status(200).json({ success: true, data: updatedOrder });
+  } catch (error) {
+    res.status(200).json({
+      success: false,
+      message: "Error while updating order",
+      error: error.message,
+    });
+  }
+};
+
+export const deleteOrder = async (req, res) => {
+  try {
+    const deletedOrder = await orderModel.deleteById(req.params.id);
+    if (!deletedOrder) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order does not exist" });
+    }
+    res.status(200).json({ success: true, message: "Order deleted successfully" });
+  } catch (error) {
+    res.status(200).json({
+      success: false,
+      message: "Error while deleting order",
+      error: error.message,
+    });
+  }
+};
+
+export const getOrdersByPayload = BaseController.getDataByPayload(orderModel, {
+  searchFields: ["user.userName", "user.phone", "user.email"],
+});
+
+export const getOrdersByUserId = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    if (!id) {
+      return res.status(400).json({ success: false, message: "Missing id" });
+    }
+
+    const orders = await orderModel
+      .findAll({ 'user._id': id })
+      .sort({ createdAt: -1 });
+    console.log("orders:",orders)
+    if (!orders.length) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        moreInfo: { products: {}, users: {} },
+      });
+    }
+
+    const productIds = orders.flatMap(
+      (order) => order.items?.map((item) => item._id) || []
+    );
+    const uniqueProductIds = [...new Set(productIds)];
+
+    const products = await productModel.findAll({
+      _id: { $in: uniqueProductIds },
+    });
+
+    const moreInfo = {
+      products: {},
+    };
+
+    products.forEach((product) => {
+      moreInfo.products[product._id] = product;
+    });
+
+    res.status(200).json({ success: true, data: orders, moreInfo });
+  } catch (error) {
+    res.status(200).json({
+      success: false,
+      message: "Error while retrieving order list",
+      error: error.message,
+    });
+  }
+};

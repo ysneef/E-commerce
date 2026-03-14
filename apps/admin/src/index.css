@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-color: #8e00e8;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+.ant-menu .ant-menu-item, .ant-menu .ant-menu-submenu-title {
+  border-radius: 0;
+}
+
+.custom-menu .ant-menu-item, .ant-menu-submenu-title {
+  height: 50px !important;
+  line-height: 50px !important;
+}

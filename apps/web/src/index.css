@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* .ant-message-notice-content {
+  background-color: #4caf50 !important;
+  color: white !important; 
+  border-radius: 8px !important;
+}
+
+.ant-message-success .ant-message-notice-content {
+  background-color: #4caf50 !important;
+}
+
+.ant-message-success .anticon {
+  color: white !important;
+} */
+.ant-btn-primary:hover {
+  background-color: white !important;
+  border-color: black !important;
+  color: black !important;
+}
+.custom-order-table .ant-table-thead>tr>th {
+  background-color: #e8f5e9 !important;
+  color: #2e7d32 !important;
+  font-weight: 600;
+}
