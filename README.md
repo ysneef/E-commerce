@@ -134,32 +134,10 @@ export default MyConstants;
 
 ---
 
-## Screenshots
-
-(Add screenshots of your website here)
-
-Example:
-
-* Home Page
-* Product Page
-* Cart Page
-* Admin Dashboard
-
----
-
-## Future Improvements
-
-* Online payment integration
-* Product search and filtering
-* Product reviews and ratings
-* Order tracking
-* Performance optimization
-
----
 
 ## Author
 
-Student Project – Web Development Course
+Vo Huynh Nhu Y
 
 ---
 
