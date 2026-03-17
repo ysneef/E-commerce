@@ -35,12 +35,25 @@ export const createOrder = async (req, res) => {
         });
       }
 
-      if (!product.sizes.includes(item.size)) {
+      const sizeExist = product.sizes.find(s => s.size === item.size);
+
+      if (!sizeExist) {
         return res.status(400).json({
           success: false,
           message: `Size ${item.size} is not valid for product ${product.name}!`,
         });
       }
+
+      if (sizeExist.quantity < item.quantity) {
+        return res.status(400).json({
+          success: false,
+          message: `Not enough stock for size ${item.size}`
+        });
+      }
+
+      sizeExist.quantity -= item.quantity;
+      await product.save();
+
 
       const discountAmount = (product.price * product.discountPercent) / 100;
       const discountedPrice = product.price - discountAmount;

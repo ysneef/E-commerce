@@ -2,34 +2,61 @@ import React from 'react';
 import { Criteria } from '..';
 import { Slider, Select, Button } from 'antd';
 import { formatNumber } from '@repo/ui';
+
 const { Option } = Select;
 
 interface FilterProps {
   onFilterChange: (filters: Criteria) => void;
-  criteria: Criteria
+  criteria: Criteria;
   resetCritia: () => void;
 }
 
 const Filter: React.FC<FilterProps> = ({ onFilterChange, criteria, resetCritia }) => {
 
+  const brands = [
+    "Nike",
+    "Adidas",
+    "Puma",
+    "New Balance",
+    "Reebok",
+    "Skechers",
+    "Asics",
+  ];
+
   const category = [
-    { "id": 1, "name": "Men", "value": "Men" },
-    { "id": 2, "name": "Women", "value": "Women" },
-    { "id": 3, "name": "Kids", "value": "Kids" },
-  ]
+    { id: 1, name: "Men", value: "Men" },
+    { id: 2, name: "Women", value: "Women" },
+    { id: 3, name: "Kids", value: "Kids" },
+  ];
+
+  const sizeMap: Record<string, string[]> = {
+    Men: [
+      "EU 38","EU 38.5","EU 39","EU 39.5","EU 40",
+      "EU 40.5","EU 41","EU 41.5","EU 42","EU 42.5",
+      "EU 43","EU 43.5","EU 44","EU 44.5","EU 45",
+      "EU 45.5","EU 46","EU 47"
+    ],
+    Women: [
+      "EU 35","EU 35.5","EU 36","EU 36.5","EU 37",
+      "EU 37.5","EU 38","EU 38.5","EU 39","EU 39.5",
+      "EU 40","EU 40.5","EU 41","EU 41.5","EU 42"
+    ],
+    Kids: [
+      "EU 21","EU 22","EU 23","EU 24","EU 25",
+      "EU 26","EU 27","EU 28","EU 29","EU 30",
+      "EU 31","EU 32","EU 33","EU 34","EU 35"
+    ]
+  };
 
   const filterOptions = {
-    categories: category.map(c => c.value),
-    sizes: [
-      'EU 35.5','EU 36','EU 36.5','EU 37','EU 37.5',
-      'EU 38','EU 38.5','EU 39','EU 39.5','EU 40',
-      'EU 40.5','EU 41','EU 41.5','EU 42','EU 42.5',
-      'EU 43','EU 43.5','EU 44','EU 44.5','EU 45','EU 45.5','EU 46'
-    ],
-  minPrice: 500000,
-  maxPrice: 10000000,
+    minPrice: 0,
+    maxPrice: 500,
   };
-  
+
+  const currentSizes =
+    sizeMap[criteria.category as keyof typeof sizeMap] ||
+    sizeMap["Men"];
+
   const updateFilters = (newFilters: Partial<Criteria>) => {
     const updated = {
       ...criteria,
@@ -40,23 +67,51 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, criteria, resetCritia }
   };
 
   const toggleSize = (size: string) => {
-    const currentSizes = criteria.sizes || [];
-    const newSizes = currentSizes.includes(size)
-      ? currentSizes.filter(s => s !== size)
-      : [...currentSizes, size];
+    const current = criteria.sizes || [];
+    const newSizes = current.includes(size)
+      ? current.filter(s => s !== size)
+      : [...current, size];
+
     updateFilters({ sizes: newSizes });
   };
 
   return (
     <div className="w-64 p-4 border bg-white h-full rounded-xl mt-3">
       <h3 className="text-lg font-bold mb-4">Filter</h3>
+
+      {/* BRAND */}
+      <div className="mb-6">
+        <h4 className="font-semibold mb-2">Brand</h4>
+        <Select
+          className="w-full"
+          placeholder="Select brand"
+          value={criteria.brand || undefined}
+          onChange={(value) => {
+            updateFilters({ brand: value });
+          }}
+          allowClear
+        >
+          {brands.map((brand) => (
+            <Option key={brand} value={brand}>
+              {brand}
+            </Option>
+          ))}
+        </Select>
+      </div>
+
+      {/* CATEGORY */}
       <div className="mb-6">
         <h4 className="font-semibold mb-2">Category</h4>
         <Select
           className="w-full"
           placeholder="Select category"
           value={criteria.category || undefined}
-          onChange={(value) => updateFilters({ category: value })}
+          onChange={(value) => {
+            updateFilters({
+              category: value,
+              sizes: [] 
+            });
+          }}
           allowClear
         >
           {category.map((cat) => (
@@ -67,13 +122,14 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, criteria, resetCritia }
         </Select>
       </div>
 
+      {/* PRICE */}
       <div className="mb-6">
         <h4 className="font-semibold mb-2">Price</h4>
         <Slider
           range
           min={filterOptions.minPrice}
           max={filterOptions.maxPrice}
-          step={50000}
+          step={10}
           value={[
             criteria.priceMin ?? filterOptions.minPrice,
             criteria.priceMax ?? filterOptions.maxPrice,
@@ -83,30 +139,35 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, criteria, resetCritia }
           }}
         />
         <div className="text-sm text-gray-600 mt-1">
-          {formatNumber(criteria.priceMin ?? filterOptions.minPrice)} -{' '}
+          {formatNumber(criteria.priceMin ?? filterOptions.minPrice)} -{" "}
           {formatNumber(criteria.priceMax ?? filterOptions.maxPrice)}
         </div>
       </div>
 
-      <div className="mb-6">
-        <h4 className="font-semibold mb-2">Size</h4>
-        <div className="grid grid-cols-3 gap-2">
-          {filterOptions.sizes.map((size) => (
-            <button
-              key={size}
-              className={`text-sm px-2 py-1 rounded-full border transition ${
-                criteria.sizes?.includes(size)
-                  ? 'bg-black text-white'
-                  : 'bg-gray-100 hover:bg-gray-200'
-              }`}
-              onClick={() => toggleSize(size)}
-            >
-              {size}
-            </button>
-          ))}
+      {/* SIZE */}
+      {criteria.category && (
+        <div className="mb-6">
+          <h4 className="font-semibold mb-2">Size</h4>
+          <div className="grid grid-cols-3 gap-2">
+            {currentSizes.map((size) => (
+              <button
+                key={size}
+                className={`text-sm px-2 py-1 rounded-full border transition ${
+                  criteria.sizes?.includes(size)
+                    ? "bg-black text-white"
+                    : "bg-gray-100 hover:bg-gray-200"
+                }`}
+                onClick={() => toggleSize(size)}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
+
+      {/* SORT */}
       <div className="mb-6">
         <h4 className="font-semibold mb-2">Sort By</h4>
         <Select
@@ -125,9 +186,10 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange, criteria, resetCritia }
         </Select>
       </div>
 
+      {/* CLEAR */}
       <Button
-        type='primary'
-        className="w-full bg-black rounded-full py-2 "
+        type="primary"
+        className="w-full bg-black rounded-full py-2"
         onClick={resetCritia}
       >
         Clear Filters

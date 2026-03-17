@@ -3,11 +3,17 @@ import { Product } from '../types/Product';
 import { User } from '../types/User';
 import { ClientApi } from './apiRequest';
 
-export type OrderPayload =  UserState & {
-  userId?: string;
-  items?: TCartItem[];
-  shippingAddress: string;
-  paymentMethod: string;
+export type OrderItemPayload = {
+  productId: string
+  quantity: number
+  size: string
+}
+
+export type OrderPayload = {
+  userId?: string
+  items: OrderItemPayload[]
+  shippingAddress: string
+  paymentMethod: string
 }
 
 export type responseOrder = {
@@ -57,8 +63,8 @@ export const orderApi = {
       });
       return response.data;
     } catch (error) {
-        console.error('Error fetching product detail:', error);
-        throw error;
+      console.error('Error creating order:', error);
+      throw error;
     }
   },
 
@@ -71,8 +77,8 @@ export const orderApi = {
       });
       return response.data;
     } catch (error) {
-        console.error('Error fetching product detail:', error);
-        throw error;
+      console.error('Error fetching orders:', error);
+      throw error;
     }
   },
 };

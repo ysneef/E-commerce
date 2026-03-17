@@ -38,15 +38,15 @@ const ProductDetail = () => {
 
   const { value: product, retry: ProductRetry } = useAsyncRetry(fetchProduct, [productId]);
 
-  const [selectedSize, setSelectedSize] = useState<string | undefined>();
+  const [selectedSize, setSelectedSize] = useState<string>();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [quantity, setQuantity] = useState<number>(1);
 
   const selectedImage = product?.image[selectedIndex];
 
   useEffect(() => {
-    if (product) {
-      setSelectedSize(product.sizes[0]);
+    if (product && product.sizes?.length > 0) {
+      setSelectedSize(product.sizes[0].size);
     }
   }, [product]);
 
@@ -54,10 +54,27 @@ const ProductDetail = () => {
     window.scrollTo(0, 0);
   }, [productId]);
 
-  const increaseQuantity = () => setQuantity((prev) => prev + 1);
+  const selectedSizeStock = product?.sizes.find(
+    (s) => s.size === selectedSize
+  )?.quantity || 0;
+  
+  useEffect(() => {
+    setQuantity(1);
+  }, [selectedSize]);
+
+
+  const increaseQuantity = () => {
+    if (quantity < selectedSizeStock) {
+      setQuantity((prev) => prev + 1);
+    }
+  };
+
 
   const decreaseQuantity = () =>
     setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
+
+
+
 
   const handleAddToCart = async () => {
     const cartItem: OrderItem = {
@@ -66,14 +83,25 @@ const ProductDetail = () => {
       price: product?.price,
       discountPercent: product?.discountPercent || 0,
       image: product?.image,
-      size: selectedSize || product?.sizes[0],
+      size: selectedSize || product?.sizes[0]?.size,
       quantity: quantity,
+      
+
     };
 
     if (!user.userName || !user.email) {
       navigate('/login');
       return;
     }
+
+    if (!selectedSize) {
+      api.error({
+        message: "Error",
+        description: "Please select size",
+      });
+      return;
+    }
+
 
     const response = await ClientProductApi.manageCart({
       ...cartItem,
@@ -208,20 +236,34 @@ const ProductDetail = () => {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                {product.sizes.map((size) => (
+                {product.sizes.map((item) => (
                   <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`min-w-[60px] px-4 py-2 rounded-lg border text-sm font-medium transition-all duration-200 ${
-                      selectedSize === size
-                        ? 'bg-black text-white border-black shadow-md'
-                        : 'bg-white text-gray-700 border-gray-300 hover:border-black hover:text-black'
-                    }`}
+                    key={item.size}
+                    onClick={() => setSelectedSize(item.size)}
+                    disabled={item.quantity === 0}
+                    className={`min-w-[60px] px-4 py-2 rounded-lg border text-sm font-medium transition-all duration-200
+                    ${
+                      selectedSize === item.size
+                        ? "bg-black text-white border-black shadow-md"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-black hover:text-black"
+                    }
+                    ${item.quantity === 0 ? "opacity-40 cursor-not-allowed" : ""}
+                    `}
                   >
-                    {size}
+                    {item.size}
                   </button>
                 ))}
+
+                <p className="text-sm text-gray-500 mt-2">
+                  {selectedSizeStock > 0
+                    ? `${selectedSizeStock} items available`
+                    : "Out of stock"}
+                </p>
+
+
               </div>
+
+              
             </div>
 
             <hr className="border-t border-gray-300 my-5" />
@@ -235,17 +277,28 @@ const ProductDetail = () => {
 
                 <span className="text-lg">{quantity}</span>
 
-                <button className="text-xl font-bold" onClick={increaseQuantity}>
+                <button
+                  className="text-xl font-bold"
+                  onClick={increaseQuantity}
+                  disabled={quantity >= selectedSizeStock}
+                >
                   +
                 </button>
               </div>
 
               <button
-                className="bg-black text-white py-3 px-10 rounded-full flex-1 transition duration-300 hover:bg-gray-800"
+                disabled={selectedSizeStock === 0}
+                className={`py-3 px-10 rounded-full flex-1 transition duration-300
+                ${
+                  selectedSizeStock === 0
+                    ? "bg-gray-300 cursor-not-allowed text-gray-500"
+                    : "bg-black text-white hover:bg-gray-800"
+                }`}
                 onClick={handleAddToCart}
               >
-                Add to cart
+                {selectedSizeStock === 0 ? "Out of stock" : "Add to cart"}
               </button>
+
             </div>
           </div>
         </div>

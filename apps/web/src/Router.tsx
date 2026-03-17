@@ -12,6 +12,7 @@ import Footer from './components/Layout/Footer';
 import Profile from './pages/Profile';
 import ProductDetail from './pages/ProductDetailPage';
 import SizeGuide from './pages/SizeGuide';
+import ScrollToTop from "./components/ScrollToTop";
 
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => (
@@ -41,7 +42,11 @@ const Router = () => {
       }}
     >
       <BrowserRouter>
+
+        <ScrollToTop />
+
         <Routes>
+
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
@@ -55,6 +60,7 @@ const Router = () => {
               </PrivateRoute>
             }
           />
+
           <Route
             path="/product"
             element={
@@ -65,6 +71,7 @@ const Router = () => {
               </PrivateRoute>
             }
           />
+
           <Route
             path="/category"
             element={
@@ -75,6 +82,18 @@ const Router = () => {
               </PrivateRoute>
             }
           />
+
+          <Route
+            path="/brand/:brand"
+            element={
+              <PrivateRoute>
+                <AppLayout>
+                  <Category />
+                </AppLayout>
+              </PrivateRoute>
+            }
+          />
+
           <Route
             path="/cart"
             element={
@@ -85,6 +104,7 @@ const Router = () => {
               </PrivateRoute>
             }
           />
+
           <Route
             path="/orders"
             element={
@@ -95,6 +115,7 @@ const Router = () => {
               </PrivateRoute>
             }
           />
+
           <Route
             path="/profile"
             element={
@@ -116,13 +137,13 @@ const Router = () => {
               </PrivateRoute>
             }
           />
-          <Route path="/category" element={<Category />} />
-          <Route path="/brand/:brand" element={<Category />} />
 
         </Routes>
+
       </BrowserRouter>
     </ConfigProvider>
   );
 };
+
 
 export default Router;

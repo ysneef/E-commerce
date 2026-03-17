@@ -1,7 +1,9 @@
 import { AdminApi } from "../../../api/apiRequest";
+import { TProduct } from "../../../models/Product.model";
 
 const ProductApi = {
-  getProduct: async (payload: any): Promise<any> => {
+
+  getProduct: async (payload?: any): Promise<any> => {
     try {
       const response = await AdminApi.axiosGet({
         data: {
@@ -9,57 +11,68 @@ const ProductApi = {
           params: payload,
         },
       });
+
       return response.data;
+
     } catch (error) {
-      console.error("🚀 ~ getProduct ~ error:", error);
+      console.error("getProduct error:", error);
       throw error;
     }
   },
 
-  createProduct: async (payload: any): Promise<any> => {
+  createProduct: async (payload: TProduct): Promise<any> => {
     try {
+
       const response = await AdminApi.axiosPost({
         data: {
           endpoint: "/api/product",
-          params: payload,
+          body: payload,
         },
       });
+
       return response.data;
+
     } catch (error) {
-      console.error("🚀 ~ createProduct ~ error:", error);
+      console.error("createProduct error:", error);
       throw error;
     }
   },
 
-  updateProduct: async (id: string, payload: any): Promise<any> => {
+  updateProduct: async (id: string, payload: TProduct): Promise<any> => {
     try {
+
       const response = await AdminApi.axiosPut({
         data: {
           endpoint: `/api/product/${id}`,
-          params: payload,
+          body: payload,
         },
       });
+
       return response.data;
+
     } catch (error) {
-      console.error("🚀 ~ updateProduct ~ error:", error);
+      console.error("updateProduct error:", error);
       throw error;
     }
   },
 
   deleteProduct: async (id: string): Promise<any> => {
     try {
+
       const response = await AdminApi.axiosDelete({
         data: {
           endpoint: `/api/product/${id}`,
-          params: {},
         },
       });
+
       return response.data;
+
     } catch (error) {
-      console.error("🚀 ~ deleteProduct ~ error:", error);
+      console.error("deleteProduct error:", error);
       throw error;
     }
   },
+
 };
 
 export default ProductApi;

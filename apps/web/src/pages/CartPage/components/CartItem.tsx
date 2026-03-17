@@ -6,7 +6,7 @@ import { formatNumber } from '@repo/ui';
 
 interface CartItemProps {
   item: TCartItem;
-  increaseQuantity: (productId: string, size: string) => void;
+  increaseQuantity: () => void;
   decreaseQuantity: (productId: string, size: string) => void;
   deleteItem: (productId: string, size: string) => void;
 }
@@ -38,13 +38,13 @@ const CartItem: React.FC<CartItemProps> = ({
           <div className="flex items-center gap-3 mt-2">
             {/* Giá sau discount */}
             <span className="text-lg font-bold text-red-600">
-              {formatNumber(displayPrice * item.quantity)} $
+              {formatNumber(displayPrice)} $
             </span>
 
             {/* Giá gốc */}
             {item.discountPercent > 0 && (
               <span className="text-sm text-gray-500 line-through">
-                {formatNumber(item.price * item.quantity)} $
+                {formatNumber(item.price)} $
               </span>
             )}
 
@@ -76,7 +76,11 @@ const CartItem: React.FC<CartItemProps> = ({
           <span className="font-semibold">{item.quantity}</span>
           <button
             onClick={() => increaseQuantity(item.productId, item.size)}
-            className="w-8 h-8 flex items-center justify-center text-2xl font-bold hover:text-black"
+            disabled={item.quantity >= item.stock}
+            className={`w-8 h-8 flex items-center justify-center text-2xl font-bold
+            ${item.quantity >= item.stock
+              ? "opacity-40 cursor-not-allowed"
+              : "hover:text-black"}`}
           >
             +
           </button>

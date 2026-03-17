@@ -25,6 +25,7 @@ export type TCartItem = {
   totalPrice: number,
   size: string,
   discountPrice: number,
+  stock: number
 }
 
 const initialState: UserState = {

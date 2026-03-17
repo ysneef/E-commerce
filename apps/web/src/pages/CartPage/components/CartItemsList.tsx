@@ -15,7 +15,16 @@ const CartItemsList: React.FC<CartItemsListProps> = ({
   decreaseQuantity,
   deleteItem,
 }) => {
-  console.log("cartItems:", cartItems);
+
+  const handleIncrease = (item: TCartItem) => {
+    if (item.quantity >= item.stock) {
+      alert("Product quantity exceeds available stock");
+      return;
+    }
+
+    increaseQuantity(item.productId, item.size);
+  };
+
   return (
     <div className="flex flex-col gap-5 flex-1 p-5 min-h-0 border-2 border-gray-200 rounded-[10px]">
       {cartItems.map((item, index) => (
@@ -25,7 +34,7 @@ const CartItemsList: React.FC<CartItemsListProps> = ({
         >
           <CartItem
             item={item}
-            increaseQuantity={increaseQuantity}
+            increaseQuantity={() => handleIncrease(item)}
             decreaseQuantity={decreaseQuantity}
             deleteItem={deleteItem}
           />
@@ -34,5 +43,6 @@ const CartItemsList: React.FC<CartItemsListProps> = ({
     </div>
   );
 };
+
 
 export default CartItemsList;

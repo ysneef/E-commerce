@@ -130,7 +130,7 @@ export const getProductsByPayload = BaseController.getDataByPayload(
 
         category: (value) => ({ category: value }),
 
-        size: (value) => {
+        sizes: (value) => {
           let sizesArray = value;
 
           if (typeof value === "string") {
@@ -145,8 +145,16 @@ export const getProductsByPayload = BaseController.getDataByPayload(
             sizesArray = [sizesArray];
           }
 
-          return { sizes: { $in: sizesArray } };
+          return {
+            sizes: {
+              $elemMatch: {
+                size: { $in: sizesArray },
+                quantity: { $gt: 0 }
+              }
+            }
+          };
         },
+
       };
 
       Object.entries(filters).forEach(([key, value]) => {
@@ -209,8 +217,17 @@ export const getProductsByPayloadClient = BaseController.getDataByPayload(
             sizesArray = [sizesArray];
           }
 
-          return { sizes: { $in: sizesArray } };
+          return {
+            sizes: {
+              $elemMatch: {
+                size: { $in: sizesArray },
+                quantity: { $gt: 0 }
+              }
+            }
+          };
         },
+
+
       };
 
       query.status = true;

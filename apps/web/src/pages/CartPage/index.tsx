@@ -8,6 +8,7 @@ import CartItemsList from './components/CartItemsList';
 import OrderSummary from './components/OrderSummary';
 import { Link } from 'react-router-dom';
 
+
 const CartPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const user = useSelector((state: RootState) => state.user);
@@ -21,6 +22,11 @@ const CartPage: React.FC = () => {
 
       if (!item) return;
 
+      if (item.quantity >= item.stock) {
+        setError("Product quantity exceeds available stock");
+        return;
+      }
+
       const param = {
         productId,
         name: item.name,
@@ -28,8 +34,9 @@ const CartPage: React.FC = () => {
         image: item.image,
         price: item.price,
         discountPercent: item.discountPercent,
-        action: 'update' as const,
-        size
+        action: "update" as const,
+        size,
+        stock: item.stock,
       };
 
       const response = await ClientProductApi.manageCart(param);
@@ -38,16 +45,17 @@ const CartPage: React.FC = () => {
         dispatch(
           setUser({
             cart: response.cart,
-            totalCart: response.totalCart
+            totalCart: response.totalCart,
           } as UserState)
         );
       } else {
-        setError(response.message || 'Unable to increase quantity');
+        setError(response.message || "Unable to increase quantity");
       }
     } catch {
-      setError('Unable to increase quantity');
+      setError("Unable to increase quantity");
     }
   };
+
 
   const decreaseQuantity = async (productId: string, size: string) => {
     try {

@@ -120,7 +120,6 @@ const Orders = () => {
                   Product List
                 </Divider>
 
-
                 <Table
                   size="small"
                   bordered={false}
@@ -128,30 +127,48 @@ const Orders = () => {
                   columns={[
                     {
                       title: 'Product',
-                      dataIndex: 'name',
-                      key: 'name',
-                      render: (text: string, record: any) => (
-                        <div className="flex items-center gap-2">
-                          <img
-                            src={record.image?.[0]}
-                            alt={text}
-                            className="w-12 h-12 object-cover rounded"
-                          />
-                          <span>{text}</span>
-                        </div>
-                      ),
+                      key: 'product',
+                      render: (_: any, record: any) => {
+
+                        const image = record.image?.[0] || "/no-image.png";
+
+                        return (
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={image}
+                              alt={record.name}
+                              className="w-14 h-14 object-cover rounded border"
+                            />
+
+                            <div className="flex flex-col">
+                              <span className="font-medium">{record.name}</span>
+
+                              {/* optional: show productId */}
+                              <span className="text-xs text-gray-400">
+                                ID: {record.productId || "N/A"}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      },
                     },
                     {
                       title: 'Size',
                       dataIndex: 'size',
                       key: 'size',
-                      align: 'center'
+                      align: 'center',
+                      render: (size: string) => (
+                        <Tag color="geekblue">{size}</Tag>
+                      ),
                     },
                     {
                       title: 'Quantity',
                       dataIndex: 'quantity',
                       key: 'quantity',
-                      align: 'center'
+                      align: 'center',
+                      render: (q: number) => (
+                        <span className="font-semibold">{q}</span>
+                      ),
                     },
                     {
                       title: 'Price',
@@ -170,9 +187,11 @@ const Orders = () => {
                       key: 'discountPercent',
                       align: 'center',
                       render: (percent: number) => (
-                        <span className="text-red-500">
-                          -{percent}%
-                        </span>
+                        percent ? (
+                          <Tag color="red">-{percent}%</Tag>
+                        ) : (
+                          <span>-</span>
+                        )
                       ),
                     },
                     {
@@ -180,21 +199,31 @@ const Orders = () => {
                       dataIndex: 'discountPrice',
                       key: 'discountPrice',
                       align: 'center',
-                      render: (price: number) => (
-                        <span className="text-green-600 font-medium">
-                          {formatNumber(price)} $
-                        </span>
-                      ),
+                      render: (_: number, record: any) => {
+
+                        const finalPrice =
+                          record.discountPrice ??
+                          record.price - (record.price * (record.discountPercent ?? 0)) / 100;
+
+                        return (
+                          <span className="text-green-600 font-semibold">
+                            {formatNumber(finalPrice)} $
+                          </span>
+                        );
+                      },
                     },
                   ]}
-                  dataSource={order.items}
+                  dataSource={order.items.map((item: any) => ({
+                    ...item,
+                    key: item._id,
+                  }))}
                   pagination={false}
-                  rowKey="_id"
-                  size="small"
+                  rowKey="key"
                   rowClassName={(_, index) =>
                     index % 2 === 0 ? 'bg-white' : 'bg-gray-100'
                   }
                 />
+
 
               </Card>
             );

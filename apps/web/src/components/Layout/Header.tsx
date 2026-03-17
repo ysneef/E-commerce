@@ -99,6 +99,7 @@ function Header() {
           <div className="relative">
             <Select
               showSearch
+              allowClear
               className="w-full sm:w-[300px] rounded-full"
               placeholder="Search for products"
               value={searchTerm}

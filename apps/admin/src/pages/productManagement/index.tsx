@@ -188,17 +188,18 @@ const ProductManagement = () => {
         </Popover>
       ),
     },
+    
     {
       title: "Sizes",
       dataIndex: "sizes",
       key: "sizes",
-      width: 130,
-      render: (sizes: string[]) =>
+      width: 160,
+      render: (sizes: any[]) =>
         sizes && sizes.length > 0 ? (
-          <div className="flex flex-wrap gap-y-1">
-            {sizes.map((size) => (
-              <Tag key={size} color="blue">
-                {size}
+          <div className="flex flex-wrap gap-1">
+            {sizes.map((item) => (
+              <Tag key={item.size} color="blue">
+                {item.size} ({item.quantity})
               </Tag>
             ))}
           </div>
@@ -206,6 +207,7 @@ const ProductManagement = () => {
           "-"
         ),
     },
+
     {
       title: "Images",
       dataIndex: "image",

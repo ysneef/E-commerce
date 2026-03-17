@@ -69,16 +69,21 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
 
-    sizes: {
-      type: [String],
-      required: true,
-      validate: {
-        validator: function (v) {
-          return v.length > 0;
+    sizes: [
+      {
+        size: {
+          type: String,
+          required: true,
         },
-        message: "Product must have at least one size!",
+        quantity: {
+          type: Number,
+          required: true,
+          min: 0,
+          default: 0,
+        },
       },
-    },
+    ],
+
 
     rating: { type: Number, default: 5 },
 

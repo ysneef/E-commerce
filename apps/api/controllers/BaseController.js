@@ -63,7 +63,7 @@ const BaseController = {
         console.error(error);
         res.status(200).json({
           success: false,
-          message: "Lỗi",
+          message: "Error",
           error: error.message,
         });
       }

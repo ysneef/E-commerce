@@ -7,12 +7,24 @@ export type TProduct = {
   discountPrice: number;
   brand: string;
   rating: number;
+
   category: {
     id: string;
     name: string;
   };
+
+  image: string[];
+
+  sizes: TProductSize[]; 
+
+  status?: boolean;
+
   createdAt: string;
   updatedAt: string;
-  image: string[]
-  status?: boolean
+};
+
+
+export type TProductSize = {
+  size: string;
+  quantity: number;
 };

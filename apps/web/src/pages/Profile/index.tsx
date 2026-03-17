@@ -53,7 +53,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-8 px-4">
+    <div className="max-w-3xl mx-auto py-20 px-4">
 
       <div className="text-center mb-6">
         <Title level={2} className="text-blue-600">My Profile</Title>
