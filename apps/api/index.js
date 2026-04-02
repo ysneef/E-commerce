@@ -1,8 +1,8 @@
 import express from "express";
-import userRoutes from "./api/userRouter.js";
-import productRoutes from "./api/productRouter.js";
-import orderRoutes from "./api/orderRouter.js";
-import reviewRoutes from "./api/reviewRoute.js";
+import userRoutes from "./router/userRouter.js";
+import productRoutes from "./router/productRouter.js";
+import orderRoutes from "./router/orderRouter.js";
+import reviewRoutes from "./router/reviewRoute.js";
 import errorHandler from "./middleware/errorHandler.js";
 import dbConnect from "./config/dbConnect.js";
 import cors from "cors";
@@ -12,7 +12,8 @@ import dotenv from "dotenv";
 import qs from "qs";
 import cookieParser from 'cookie-parser';
 
-dotenv.config();
+import dashboardRoute from "./router/dashboardRouter.js";
+
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -43,6 +44,8 @@ app.use(cookieParser());
 
 app.use(helmet());
 app.use(morgan("dev"));
+
+app.use("/api/dashboard", dashboardRoute);
 
 app.use("/api/users", userRoutes);
 app.use("/api/product", productRoutes);

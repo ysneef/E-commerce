@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import LayoutWrapper from "./LayoutWrapper"
-import DashboardContent from "../../pages/DashboardContent"
+import DashboardContent from "../../pages/Dashboard/DashboardContent"
 import Login from "./Login"
 import PrivateRoute from "./PrivateRoute"
 import UserManagement from "../../pages/UserManagement"

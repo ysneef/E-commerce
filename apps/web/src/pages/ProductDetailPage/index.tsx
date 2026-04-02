@@ -205,7 +205,14 @@ const ProductDetail = () => {
               {formatNumber(product.discountPrice)} $
             </span>
 
-            <p className="text-[#666666]">{product.description}</p>
+            <p className="text-[#666666]">
+              {product.description?.split('\n').map((line, index) => (
+                <span key={index}>
+                  {line}
+                  <br />
+                </span>
+              ))}
+            </p>
 
             <hr className="border-t border-gray-300 my-5" />
 

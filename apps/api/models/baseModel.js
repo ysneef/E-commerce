@@ -71,6 +71,12 @@ const baseModel = (model) => ({
       throw new Error(error.message)
     }
   },
+
+  countDocuments: async (filter) => {
+    return await Model.countDocuments(filter);
+  },
+
+
 })
 
 export default baseModel

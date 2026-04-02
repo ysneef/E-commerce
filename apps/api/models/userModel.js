@@ -35,7 +35,8 @@ const userSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-const User = mongoose.model("User", userSchema);
+
+export const User = mongoose.model("User", userSchema);
 
 const userModel = {
   ...baseModel(User),
