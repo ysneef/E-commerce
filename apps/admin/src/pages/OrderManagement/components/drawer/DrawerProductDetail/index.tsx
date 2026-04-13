@@ -24,16 +24,9 @@ const DrawerProductDetail: React.FC<DrawerProductDetailProps> = ({ visible, onCl
       dataIndex: "name",
       key: "name",
       render: (text: string, record: any) => (
-        <div className="flex items-center gap-3">
-          <img
-            src={record.image?.[0] || "https://via.placeholder.com/50"}
-            alt={text}
-            className="w-10 h-10 object-cover rounded-md border"
-          />
-          <div>
-            <div className="font-semibold text-gray-800">{text}</div>
-            <Tag color="blue">Size: {record.size}</Tag>
-          </div>
+        <div>
+          <div className="font-semibold text-gray-800">{text}</div>
+          <Tag color="blue">Size: {record.size}</Tag>
         </div>
       ),
     },
@@ -118,31 +111,35 @@ const DrawerProductDetail: React.FC<DrawerProductDetailProps> = ({ visible, onCl
 
         {/* Product Items Table */}
         <section>
-          <Title level={5} className="mb-4">Order Items</Title>
+          <div className="flex items-center justify-between mb-4">
+            <Title level={5} className="m-0 uppercase tracking-wider text-xs font-bold text-gray-500">Order Items</Title>
+            <Tag color="default">{order.items.length} Items</Tag>
+          </div>
           <Table
             dataSource={order.items}
             columns={columns}
             rowKey={(record, index) => `${record._id}-${index}`}
             pagination={false}
-            className="border rounded-lg overflow-hidden"
+            className="modern-table"
+            bordered={false}
           />
         </section>
 
         {/* Order Summary */}
-        <section className="flex justify-end">
-          <div className="w-80 space-y-3 bg-gray-50 p-6 rounded-xl border border-gray-100">
-            <div className="flex justify-between items-center">
-              <Text type="secondary">Subtotal:</Text>
-              <Text className="font-semibold">{formatNumber(order.totalPrice + (order.discount || 0))} $</Text>
+        <section className="flex justify-end pt-6">
+          <div className="w-full max-w-xs space-y-4">
+            <div className="flex justify-between items-center px-2">
+              <Text className="text-gray-500">Subtotal</Text>
+              <Text className="font-medium">{formatNumber(order.totalPrice + (order.discount || 0))} $</Text>
             </div>
-            <div className="flex justify-between items-center">
-              <Text type="secondary">Discount:</Text>
-              <Text className="font-semibold text-red-500">-{formatNumber(order.discount || 0)} $</Text>
+            <div className="flex justify-between items-center px-2">
+              <Text className="text-gray-500">Discount</Text>
+              <Text className="font-medium text-red-500">-{formatNumber(order.discount || 0)} $</Text>
             </div>
-            <Divider className="my-2" />
-            <div className="flex justify-between items-center">
-              <Title level={4} className="m-0 text-blue-600">Total:</Title>
-              <Title level={4} className="m-0 text-blue-600 font-bold">{formatNumber(order.totalPrice)} $</Title>
+            <Divider className="my-2 border-gray-100" />
+            <div className="flex justify-between items-center px-2 py-1">
+              <Title level={4} className="m-0 text-gray-800 font-bold uppercase tracking-tight text-lg">Total Amount</Title>
+              <Title level={4} className="m-0 text-blue-600 font-black text-xl">{formatNumber(order.totalPrice)} $</Title>
             </div>
           </div>
         </section>
