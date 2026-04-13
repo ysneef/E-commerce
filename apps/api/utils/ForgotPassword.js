@@ -12,11 +12,14 @@ const ForgotPassword = async (email, token, otp) => {
             throw new Error("Missing EMAIL_USER or EMAIL_PASS in environment variables");
         }
 
+        const EMAIL_PASS_CLEAN = EMAIL_PASS.replace(/\s/g, '');
         const transport = nodemailer.createTransport({
-            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
             auth: {
                 user: EMAIL_USER,
-                pass: EMAIL_PASS,
+                pass: EMAIL_PASS_CLEAN,
             },
         });
 

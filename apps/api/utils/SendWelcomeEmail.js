@@ -13,11 +13,14 @@ export const sendWelcomeEmail = async (email, userName) => {
             return false;
         }
 
+        const EMAIL_PASS_CLEAN = EMAIL_PASS.replace(/\s/g, '');
         const transport = nodemailer.createTransport({
-            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
             auth: {
                 user: EMAIL_USER,
-                pass: EMAIL_PASS,
+                pass: EMAIL_PASS_CLEAN,
             },
         });
 
