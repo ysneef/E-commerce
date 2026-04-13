@@ -4,10 +4,17 @@ import eslint from "vite-plugin-eslint"
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), , eslint()],
+  base: '/admin/',
+  plugins: [react(), eslint()],
   server: {
     port: 3002, // Cổng bạn muốn chạy
     open: true, // Tự động mở trình duyệt
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+    },
   },
 })
 process.on("SIGINT", () => {

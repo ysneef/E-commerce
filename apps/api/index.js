@@ -1,4 +1,9 @@
 import express from "express";
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import userRoutes from "./router/userRouter.js";
 import productRoutes from "./router/productRouter.js";
 import orderRoutes from "./router/orderRouter.js";
@@ -60,6 +65,17 @@ app.use("/api/stripe", stripeRoutes);
 app.use("/api/chat", chatRoutes);
 
 app.use(errorHandler);
+
+// deployment
+app.use('/admin', express.static(path.resolve(__dirname, '../admin/dist')));
+app.get('/admin/*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../admin/dist', 'index.html'));
+});
+
+app.use('/', express.static(path.resolve(__dirname, '../web/dist')));
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../web/dist', 'index.html'));
+});
 
 // Khởi động server
 app.listen(port, () => {
