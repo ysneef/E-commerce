@@ -7,7 +7,7 @@ import { maskPhone } from "../../Utils/Funtions"
 import { InfoList } from "../../components/InfoList"
 import UserApi from "./api/User.api"
 import FilterUser from "./components/Filter"
-import AddUser from "./components/drawer/AddUser"
+import AddUser from "./components/drawer/addUser"
 import { TUser } from "./models/User.model"
 import { Popconfirm } from "antd/lib"
 
