@@ -25,6 +25,7 @@ import stripeRoutes from "./router/stripeRouter.js";
 dotenv.config();
 
 const app = express();
+app.set('trust proxy', 1); // trust first proxy (Replit, Heroku, etc.)
 const port = process.env.PORT || 3001;
 
 dbConnect();
