@@ -100,16 +100,17 @@ const Login: React.FC = () => {
             </Button>
           </Form.Item>
 
-          <div className="text-center text-sm text-gray-500 mt-2">
-            Don't have an account?{" "}
-            <span
-              className="text-blue-500 hover:underline cursor-pointer font-medium"
-              onClick={() => navigate("/register")}
-            >
-              Register now
-            </span>
-          </div>
-
+          <Form.Item>
+            <div className="text-center text-sm text-gray-500 mt-2">
+              Don't have an account?{" "}
+              <span
+                className="text-blue-500 hover:underline cursor-pointer font-medium"
+                onClick={() => navigate("/register")}
+              >
+                Register now
+              </span>
+            </div>
+          </Form.Item>
         </Form>
       </Card>
       {contextHolder}
