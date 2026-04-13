@@ -128,19 +128,22 @@ const CartPage: React.FC = () => {
   if (!user?.cart) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
   if (user?.cart?.length === 0) {
-  return (
-    <div className="max-w-screen-xl mx-auto pt-32 text-center">
-      <h2 className="text-2xl font-semibold mb-4">Your cart is empty</h2>
-      <Link to="/category" className="text-black-500">
-        Continue shopping
-      </Link>
-    </div>
-  );
-}
+    return (
+      <div className="max-w-screen-xl mx-auto pt-40 pb-40 text-center min-h-[60vh]">
+        <h2 className="text-3xl font-bold mb-6 text-gray-800">Your cart is empty</h2>
+        <Link 
+          to="/category" 
+          className="inline-block px-8 py-3 bg-black text-white rounded-full hover:bg-gray-800 transition-all duration-300"
+        >
+          Continue shopping
+        </Link>
+      </div>
+    );
+  }
 
 
   return (
-    <div className="max-w-screen-xl mx-auto pt-20 pb-10">
+    <div className="max-w-screen-xl mx-auto pt-28 pb-32 px-4">
       <div className="my-5">
         <Breadcrumb
           separator=">"
