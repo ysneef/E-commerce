@@ -69,7 +69,7 @@ const DrawerProductDetail: React.FC<DrawerProductDetailProps> = ({ visible, onCl
     >
       <div className="space-y-8">
         {/* Order Status Steps */}
-        <section className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+        <section className="py-4">
           <Steps
             current={currentStatusIndex}
             items={[
