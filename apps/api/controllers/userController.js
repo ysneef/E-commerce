@@ -4,6 +4,7 @@ import userModel from "../models/userModel.js";
 import JwtUtil from "../utils/JwtUtil.js";
 import BaseController from "./BaseController.js";
 import ForgotPassword from "../utils/ForgotPassword.js";
+import { sendWelcomeEmail } from "../utils/SendWelcomeEmail.js";
 
 const hashPassword = (password) => {
   return crypto.createHash("md5").update(password).digest("hex");
@@ -28,6 +29,9 @@ export const registerUser = async (req, res) => {
     });
 
     console.log("🚀 ~ registerUser ~ user:", user);
+
+    // Send welcome email (non-blocking)
+    sendWelcomeEmail(user.email, user.userName).catch(console.error);
 
     res.json({ success: true, message: "Registration successful", user });
   } catch (error) {
