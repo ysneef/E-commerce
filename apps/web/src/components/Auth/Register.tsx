@@ -31,9 +31,11 @@ function Register() {
       if (response.success) {
         api.success({
           message: "Success",
-          description: "Registration successful!",
+          description: "Registration successful! Redirecting to login...",
         });
-        navigate('/login');
+        setTimeout(() => {
+          navigate('/login');
+        }, 1500);
       } else {
         api.error({
           message: "Error",

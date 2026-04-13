@@ -18,21 +18,17 @@ const Login: React.FC = () => {
       const response = await UserApi.login(values)
       if (response?.success) {
         if (!_.isEmpty(response) && response.user) {
-          // if (response.user.role === "admin") {
-          //   window.location.href = "http://localhost:3002"
-          // } else if (response.user.role === "user") {
-          //   const path = from === "/" ? "" : from
-          //   window.location.href = `http://localhost:3000${path}`
-          // } else {
-          //   api.error({
-          //     message: "Error",
-          //     description: "Invalid role",
-          //   })
-          // }
+          api.success({
+            message: "Success",
+            description: "Login successful! Redirecting...",
+          });
 
           const path = from === "/" ? "" : from
           const baseUrl = import.meta.env.VITE_WEB_BASE_URL || window.location.origin
-          window.location.href = `${baseUrl}${path}`
+          
+          setTimeout(() => {
+            window.location.href = `${baseUrl}${path}`
+          }, 1000);
         } else {
           api.error({
             message: "Error",
