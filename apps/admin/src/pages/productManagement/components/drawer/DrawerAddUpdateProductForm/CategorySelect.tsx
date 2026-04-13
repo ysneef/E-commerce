@@ -19,7 +19,7 @@ const CategorySelect: React.FC<CategorySelectProps> = ({ onChange, value, multip
     const [categories, setCategories] = useState<Category[]>([]);
 
     useEffect(() => {
-        fetch("../../../../../../public/categories.json")
+        fetch("/admin/categories.json")
         .then(response => response.json())
         .then((data: Category[]) => setCategories(data))
         .catch(error => console.error("Error loading categories:", error));
