@@ -24,6 +24,7 @@ router.post("/cart", JwtUtil.checkToken, manageCartItem);
 router.get("/me", JwtUtil.checkToken, getUserProfile);
 router.get("/get", JwtUtil.checkToken, getUserByPayload);
 router.put("/:id", JwtUtil.checkToken, updateUserProfile);
+router.delete("/:id", JwtUtil.checkToken, deleteUser);
 
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);

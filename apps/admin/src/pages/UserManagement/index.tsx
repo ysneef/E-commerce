@@ -1,5 +1,5 @@
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons"
-import { Avatar, Button, Table, Tag, Tooltip, notification } from "antd"
+import { Avatar, Button, Table, Tag, Tooltip, notification, Popconfirm } from "antd"
 import moment from "moment"
 import { useState } from "react"
 import { useAsyncRetry } from "react-use"
@@ -9,7 +9,6 @@ import UserApi from "./api/User.api"
 import FilterUser from "./components/Filter"
 import AddUser from "./components/drawer/AddUser"
 import { TUser } from "./models/User.model"
-import { Popconfirm } from "antd/lib"
 
 const ROLE_TAG_CONFIG = {
   admin: { color: "red", label: "Admin" },
@@ -169,7 +168,60 @@ const UserManagement = () => {
         </Tooltip>
       ),
     },
+    {
+      title: "Action",
+      key: "action",
+      width: 100,
+      fixed: "right",
+      render: (_: any, record: TUser) => (
+        <Popconfirm
+          title="Delete user"
+          description="Are you sure you want to delete this user?"
+          onConfirm={() => handleDeleteUser(record._id)}
+          okText="Yes"
+          cancelText="No"
+        >
+          <Tooltip title="Delete">
+            <Button
+              type="primary"
+              danger
+              icon={<DeleteOutlined />}
+              size="small"
+              loading={loadingAction}
+            />
+          </Tooltip>
+        </Popconfirm>
+      ),
+    },
   ]
+
+  const handleDeleteUser = async (id: string) => {
+    try {
+      setLoadingAction(true);
+      const response = await UserApi.deleteUser(id);
+
+      if (response.success) {
+        api.success({
+          message: "Success",
+          description: "User deleted successfully!",
+        });
+        retry();
+      } else {
+        api.error({
+          message: "Error",
+          description: response.message || "Failed to delete user!",
+        });
+      }
+    } catch (error) {
+      console.log("🚀 ~ handleDeleteUser ~ error:", error);
+      api.error({
+        message: "Error",
+        description: "An error occurred while deleting user!",
+      });
+    } finally {
+      setLoadingAction(false);
+    }
+  };
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-lg">
