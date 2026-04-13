@@ -67,8 +67,8 @@ temp
 .cache
 
 # Replit
-.replit
-replit.nix
+#.replit
+#replit.nix
 .config/
 
 node_modules/
