@@ -64,6 +64,7 @@ const DrawerProductDetail: React.FC<DrawerProductDetailProps> = ({ visible, onCl
       width={1000}
       open={visible}
       onClose={onClose}
+      maskClosable={true}
       bodyStyle={{ padding: "24px" }}
     >
       <div className="space-y-8">

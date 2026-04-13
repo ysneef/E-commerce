@@ -50,8 +50,7 @@ const OrderManagement = () => {
 
   const handleCloseProductDrawer = () => {
     setProductDrawerVisible(false);
-    setSelectedOrder([]);
-    // setSelectedProducts([]);
+    setSelectedOrder(null);
   };
 
   const [criteria, setCriteria] = useState({
