@@ -32,7 +32,13 @@ const Login: React.FC = () => {
     const responese = await getUser(values)
     if (responese?.success) {
       if (!_.isEmpty(responese) && responese.user.role === "admin") {
-        navigate(from, { replace: true })
+        api.success({
+          message: "Success",
+          description: "Admin login successful! Redirecting...",
+        });
+        setTimeout(() => {
+          navigate(from, { replace: true })
+        }, 1000);
       } else {
         api.error({
           message: "Error",
