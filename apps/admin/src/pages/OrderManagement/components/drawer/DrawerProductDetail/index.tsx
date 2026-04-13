@@ -28,7 +28,7 @@ const DrawerProductDetail: React.FC<DrawerProductDetailProps> = ({ visible, onCl
           <img
             src={record.image?.[0] || "https://via.placeholder.com/50"}
             alt={text}
-            className="w-12 h-12 object-cover rounded-md border"
+            className="w-10 h-10 object-cover rounded-md border"
           />
           <div>
             <div className="font-semibold text-gray-800">{text}</div>
