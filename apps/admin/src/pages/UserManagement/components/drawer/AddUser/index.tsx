@@ -71,32 +71,11 @@ const AddUser: React.FC<AddUserProps> = ({
         </Form.Item>
 
         <Form.Item
-            label="Password"
-            name="password"
-            rules={[
-                {
-                    required: !initialValues, 
-                    message: "Please enter the password!",
-                    validator: (_, value) => {
-                        if (!value) {
-                          if (initialValues) return Promise.resolve();
-                          return Promise.reject("Please enter the password!");
-                        }
-                        if (value.length >= 6) return Promise.resolve();
-                        return Promise.reject("Password must be at least 6 characters!");
-                    },
-                },
-            ]}
-        >
-          <Input.Password placeholder={initialValues ? "Leave blank to keep current password" : "Enter password"} />
-        </Form.Item>
-
-        <Form.Item
           label="Email"
           name="email"
           rules={[
             { required: true, message: "Please enter the email!" },
-            { type: 'email', message: "Invalid email format!"},
+            { type: 'email', message: "Invalid email format!" },
           ]}
         >
           <Input placeholder="Enter email" />

@@ -82,8 +82,10 @@ const DashboardContent = () => {
 
 
   return (
-    <div className="p-6">
-      <Title level={2}>Dashboard</Title>
+    <div className="p-6 bg-white rounded-lg shadow-lg">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+        Dashboard
+      </h2>
 
       {/* ===== STATS ===== */}
       <Row gutter={[16, 16]}>
