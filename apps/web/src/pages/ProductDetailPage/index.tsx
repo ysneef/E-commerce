@@ -156,24 +156,24 @@ const ProductDetail = () => {
               {product.image.map((image, index) => (
                 <div
                   key={index}
-                  className={`w-28 h-28 rounded-lg overflow-hidden cursor-pointer border bg-[#F0EEED] p-3 ${selectedIndex === index ? 'border-black' : 'border-transparent'
+                  className={`w-28 h-28 rounded-lg overflow-hidden cursor-pointer border bg-[#F0EEED] p-5 ${selectedIndex === index ? 'border-black' : 'border-transparent'
                     }`}
                   onClick={() => setSelectedIndex(index)}
                 >
                   <img
                     src={image}
                     alt={`thumb-${index}`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                 </div>
               ))}
             </div>
 
-            <div className="w-[25rem] h-[25rem] rounded-xl overflow-hidden bg-[#F0EEED] p-3">
+            <div className="w-[25rem] h-[25rem] rounded-xl overflow-hidden bg-[#F0EEED] p-10 flex items-center justify-center">
               <img
                 src={selectedImage}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain hover:scale-110 transition-transform duration-500"
               />
             </div>
           </div>
