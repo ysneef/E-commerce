@@ -43,7 +43,7 @@ export const createCheckoutSession = async (req, res) => {
         }
 
         const encodedAddress = encodeURIComponent(shippingAddress);
-        const frontendUrl = 'http://localhost:3000'; 
+        const frontendUrl = process.env.FRONTEND_URL || req.headers.origin || 'http://localhost:3000'; 
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],

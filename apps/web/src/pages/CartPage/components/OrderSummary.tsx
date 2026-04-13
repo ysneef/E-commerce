@@ -79,13 +79,6 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ cartItems = [] }) => {
 
     try {
       if (paymentMethod === "Credit Card") {
-        if (!apiBase) {
-          return api.error({
-            message: "Payment unavailable",
-            description: "Payment is not configured. Please choose Cash on Delivery.",
-          });
-        }
-
         // Intercept for Stripe Checkout
         const items = safeCartItems.map((item) => ({
           productId: item.productId,
