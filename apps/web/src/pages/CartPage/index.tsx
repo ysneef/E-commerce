@@ -34,6 +34,7 @@ const CartPage: React.FC = () => {
         image: item.image,
         price: item.price,
         discountPercent: item.discountPercent,
+        discountPrice: item.discountPrice,
         action: "update" as const,
         size,
         stock: item.stock,
@@ -77,6 +78,7 @@ const CartPage: React.FC = () => {
         image: item.image,
         price: item.price,
         discountPercent: item.discountPercent,
+        discountPrice: item.discountPrice,
         action: 'update' as const,
         size
       };

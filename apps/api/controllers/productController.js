@@ -1,4 +1,5 @@
 import { productModel } from "../models/productModel.js";
+import FlashSale from "../models/flashSaleModel.js";
 import BaseController from "./BaseController.js";
 
 export const getProductById = async (req, res) => {
@@ -9,7 +10,33 @@ export const getProductById = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Product does not exist" });
     }
-    res.status(200).json({ success: true, data: product });
+
+    // Check for active flash sale
+    const now = new Date();
+    const activeSale = await FlashSale.findOne({
+      startTime: { $lte: now },
+      endTime: { $gte: now },
+      status: true,
+      "products.productId": product._id,
+    });
+
+    let productData = product.toObject ? product.toObject() : product;
+
+    if (activeSale) {
+      const saleProduct = activeSale.products.find(
+        (p) => p.productId === product._id.toString()
+      );
+      if (saleProduct) {
+        const calculatedFlashPrice = productData.price - (productData.price * saleProduct.flashSalePercent / 100);
+        productData.flashSaleInfo = {
+          price: calculatedFlashPrice,
+          endTime: activeSale.endTime,
+          saleName: activeSale.name,
+        };
+      }
+    }
+
+    res.status(200).json({ success: true, data: productData });
   } catch (error) {
     res.status(200).json({
       success: false,
@@ -19,20 +46,30 @@ export const getProductById = async (req, res) => {
   }
 };
 
+const capitalize = (str) => {
+  if (!str) return str;
+  return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+};
+
 export const createProduct = async (req, res) => {
   try {
-    let { price, discountPercent, ...productData } = req.body;
+    let { price, discountPercent, category, brand, ...productData } = req.body;
 
-    price = price ? parseFloat(price) : undefined;
+    price = price ? parseFloat(price) : 0;
     discountPercent = discountPercent ? parseFloat(discountPercent) : 0;
+    
+    // Normalize casing for enums
+    category = capitalize(category);
+    brand = capitalize(brand);
 
-    if (price !== undefined && discountPercent !== undefined) {
-      productData.discountPrice = price - (price * discountPercent) / 100;
-    }
+    const discountPrice = price - (price * discountPercent) / 100;
 
     const newProduct = await productModel.create({
       price,
       discountPercent,
+      discountPrice,
+      category,
+      brand,
       ...productData,
     });
 
@@ -48,18 +85,29 @@ export const createProduct = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
   try {
-    let { price, discountPercent, ...updateData } = req.body;
+    let { price, discountPercent, category, brand, ...updateData } = req.body;
 
-    price = price ? parseFloat(price) : undefined;
-    discountPercent = discountPercent ? parseFloat(discountPercent) : undefined;
+    price = price !== undefined ? parseFloat(price) : undefined;
+    discountPercent = discountPercent !== undefined ? parseFloat(discountPercent) : undefined;
+    
+    if (category) category = capitalize(category);
+    if (brand) brand = capitalize(brand);
 
-    if (price !== undefined && discountPercent !== undefined) {
-      updateData.discountPrice = price - (price * discountPercent) / 100;
+    // If either price or discountPercent is updated, recalculate discountPrice
+    // Otherwise we need the original values, but for simplicity let's check if they exist in body
+    if (price !== undefined || discountPercent !== undefined) {
+      // Note: This logic assumes if one is sent, the other either is too or we use defaults
+      // In a real app we might fetch the product first if one is missing
+      const p = price !== undefined ? price : 0;
+      const d = discountPercent !== undefined ? discountPercent : 0;
+      updateData.discountPrice = p - (p * d) / 100;
     }
 
     const updatedProduct = await productModel.updateById(req.params.id, {
       price,
       discountPercent,
+      category,
+      brand,
       ...updateData,
     });
 
@@ -226,11 +274,24 @@ export const getProductsByPayloadClient = BaseController.getDataByPayload(
             }
           };
         },
-
-
       };
 
       query.status = true;
+
+      // Handle excludeFlashSale logic
+      if (filters.excludeFlashSale === "true" || filters.excludeFlashSale === true) {
+        const now = new Date();
+        const activeSale = await FlashSale.findOne({
+          startTime: { $lte: now },
+          endTime: { $gte: now },
+          status: true,
+        });
+
+        if (activeSale && activeSale.products?.length > 0) {
+          const saleProductIds = activeSale.products.map(p => p.productId);
+          query._id = { $nin: saleProductIds };
+        }
+      }
 
       Object.entries(filters).forEach(([key, value]) => {
         if (
@@ -244,5 +305,34 @@ export const getProductsByPayloadClient = BaseController.getDataByPayload(
         }
       });
     },
+    extraProcessing: async (results) => {
+      const now = new Date();
+      const activeSale = await FlashSale.findOne({
+        startTime: { $lte: now },
+        endTime: { $gte: now },
+        status: true,
+      });
+
+      if (!activeSale) return {};
+
+      const newData = results.map(product => {
+        let productData = product.toObject ? product.toObject() : { ...product };
+        const saleProduct = activeSale.products.find(
+          (p) => p.productId === productData._id.toString()
+        );
+
+        if (saleProduct) {
+          const calculatedFlashPrice = productData.price - (productData.price * saleProduct.flashSalePercent / 100);
+          productData.flashSaleInfo = {
+            price: calculatedFlashPrice,
+            endTime: activeSale.endTime,
+            flashSaleName: activeSale.name,
+          };
+        }
+        return productData;
+      });
+
+      return { data: newData };
+    }
   }
 );

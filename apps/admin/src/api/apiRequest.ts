@@ -26,6 +26,9 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
+
+
+
 export const AdminApi = {
 
   axiosGet: async ({ data }: AxiosRequestProps) => {

@@ -44,10 +44,8 @@ export type Item = {
   quantity: number
   image: string[]
   price: number
-  discountPercent: number
   totalPrice: number
   size: string
-  discountPrice: number
 }
 
 

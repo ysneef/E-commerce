@@ -66,6 +66,21 @@ const ClientProductApi = {
       return error?.response as any;
     }
   },
+
+  getActiveFlashSale: async (): Promise<any> => {
+    try {
+      const response = await ClientApi.axiosGet({
+        data: {
+          endpoint: '/api/flash-sale/active',
+          params: {},
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching active flash sale:', error);
+      return { success: false };
+    }
+  },
 };
 
 export default ClientProductApi;

@@ -3,19 +3,14 @@ export type TProduct = {
   name: string;
   description: string;
   price: number;
-  discountPercent: number;
-  discountPrice: number;
   brand: string;
   rating: number;
 
-  category: {
-    id: string;
-    name: string;
-  };
+  category: string;
 
   image: string[];
 
-  sizes: TProductSize[]; 
+  sizes: TProductSize[];
 
   status?: boolean;
 

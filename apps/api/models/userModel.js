@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema({
       image: { type: [String] },
       price: { type: Number },
       discountPercent: { type: Number, default: 0 },
+      discountPrice: { type: Number },
       size: { type: String },
     },
   ],
@@ -31,6 +32,8 @@ const userSchema = new mongoose.Schema({
   // order: { type: [String], default: [] },
   // cart: { type: [String], default: [] },
   role: { type: String, required: true, enum: ["user", "admin"] },
+  resetPasswordOTP: { type: String, default: "" },
+  resetPasswordExpires: { type: Date },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

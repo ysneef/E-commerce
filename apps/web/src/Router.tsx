@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
+import ForgotPassword from './components/Auth/ForgotPassword';
 import PrivateRoute from './components/Layout/PrivateRoute';
 import CartPage from './pages/CartPage';
 import Category from './pages/CategoryPage';
@@ -13,6 +14,8 @@ import Profile from './pages/Profile';
 import ProductDetail from './pages/ProductDetailPage';
 import SizeGuide from './pages/SizeGuide';
 import ScrollToTop from "./components/ScrollToTop";
+import CheckoutSuccess from './pages/CheckoutSuccess';
+import ChatBubble from './components/ChatBubble';
 
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => (
@@ -20,6 +23,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => (
     <Header />
     {children}
     <Footer />
+    <ChatBubble />
   </>
 );
 
@@ -49,6 +53,7 @@ const Router = () => {
 
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
           <Route
             path="/"
@@ -133,6 +138,17 @@ const Router = () => {
               <PrivateRoute>
                 <AppLayout>
                   <SizeGuide />
+                </AppLayout>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/checkout-success"
+            element={
+              <PrivateRoute>
+                <AppLayout>
+                  <CheckoutSuccess />
                 </AppLayout>
               </PrivateRoute>
             }

@@ -57,7 +57,7 @@ const ProductDetail = () => {
   const selectedSizeStock = product?.sizes.find(
     (s) => s.size === selectedSize
   )?.quantity || 0;
-  
+
   useEffect(() => {
     setQuantity(1);
   }, [selectedSize]);
@@ -77,16 +77,17 @@ const ProductDetail = () => {
 
 
   const handleAddToCart = async () => {
+    const activePrice = product?.flashSaleInfo ? product.flashSaleInfo.price : product?.discountPrice;
+
     const cartItem: OrderItem = {
       productId: product?._id,
       name: product?.name,
       price: product?.price,
-      discountPercent: product?.discountPercent || 0,
+      discountPercent: product?.flashSaleInfo ? 0 : product?.discountPercent || 0,
+      discountPrice: activePrice,
       image: product?.image,
       size: selectedSize || product?.sizes[0]?.size,
       quantity: quantity,
-      
-
     };
 
     if (!user.userName || !user.email) {
@@ -140,7 +141,7 @@ const ProductDetail = () => {
           separator=">"
           items={[
             { title: <Link to="/">Home</Link> },
-            { title: <Link to="/category">Category</Link> },
+            { title: <Link to="/category">{typeof product.category === 'object' ? (product.category as any).name : (product.category || 'Category')}</Link> },
             { title: product.name },
           ]}
         />
@@ -155,9 +156,8 @@ const ProductDetail = () => {
               {product.image.map((image, index) => (
                 <div
                   key={index}
-                  className={`w-28 h-28 rounded-lg overflow-hidden cursor-pointer border bg-[#F0EEED] p-3 ${
-                    selectedIndex === index ? 'border-black' : 'border-transparent'
-                  }`}
+                  className={`w-28 h-28 rounded-lg overflow-hidden cursor-pointer border bg-[#F0EEED] p-3 ${selectedIndex === index ? 'border-black' : 'border-transparent'
+                    }`}
                   onClick={() => setSelectedIndex(index)}
                 >
                   <img
@@ -180,6 +180,11 @@ const ProductDetail = () => {
 
           {/* Product info */}
           <div className="w-3/5 xl:max-w-[35rem]">
+            {product.category && (
+              <p className="text-gray-500 uppercase tracking-widest text-xs font-bold mb-1">
+                {product.category.name}
+              </p>
+            )}
             <h1 className="text-3xl font-extrabold mb-2">{product.name}</h1>
 
             <div className="flex items-center text-lg mb-2">
@@ -194,15 +199,21 @@ const ProductDetail = () => {
                 </span>
               )}
 
-              {product.discountPercent > 0 && (
+              {product.discountPercent > 0 && !product.flashSaleInfo && (
                 <span className="bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded">
                   -{product.discountPercent}%
                 </span>
               )}
+
+              {product.flashSaleInfo && (
+                <span className="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-bold px-3 py-1 rounded shadow-lg animate-pulse">
+                  FLASH SALE
+                </span>
+              )}
             </div>
 
-            <span className="text-xl text-black font-bold mb-3">
-              {formatNumber(product.discountPrice)} $
+            <span className="text-3xl text-red-600 font-black mb-3 block">
+              {formatNumber(product.flashSaleInfo ? product.flashSaleInfo.price : product.discountPrice)} $
             </span>
 
             <p className="text-[#666666]">
@@ -214,6 +225,23 @@ const ProductDetail = () => {
               ))}
             </p>
 
+            <div className="mt-4 flex flex-col gap-1">
+              {product.category && (
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="font-semibold text-gray-700">Category:</span>
+                  <span className="font-semibold text-gray-700">
+                    {typeof product.category === 'object' ? (product.category as any).name : product.category}
+                  </span>
+                </div>
+              )}
+              {product.brand && (
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="font-semibold text-gray-700">Brand:</span>
+                  <span className="font-semibold text-gray-700">{product.brand}</span>
+                </div>
+              )}
+            </div>
+
             <hr className="border-t border-gray-300 my-5" />
 
             {/* SIZE SECTION */}
@@ -221,25 +249,25 @@ const ProductDetail = () => {
               <div className="flex items-center justify-between mb-3">
                 <p className="font-semibold text-gray-800">Choose size</p>
 
-                  <a
-                    href="/size-guide"
-                    className="flex items-center gap-2 text-black-800"
+                <a
+                  href="/size-guide"
+                  className="flex items-center gap-2 text-black-800"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="20"
+                    height="20"
+                    fill="none"
                   >
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="20"
-                      height="20"
-                      fill="none"
-                    >
-                      <path
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        d="M21.75 10.5v6.75a1.5 1.5 0 01-1.5 1.5H3.75a1.5 1.5 0 01-1.5-1.5V10.5m3.308-2.25h12.885m-12.885 0L8.21 5.599M5.558 8.25l2.652 2.652M18.443 8.25L15.79 5.599m2.653 2.651l-2.653 2.652M17.25 19v-2.5M12 19v-2.5M6.75 19v-2.5"
-                      />
-                    </svg>
+                    <path
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      d="M21.75 10.5v6.75a1.5 1.5 0 01-1.5 1.5H3.75a1.5 1.5 0 01-1.5-1.5V10.5m3.308-2.25h12.885m-12.885 0L8.21 5.599M5.558 8.25l2.652 2.652M18.443 8.25L15.79 5.599m2.653 2.651l-2.653 2.652M17.25 19v-2.5M12 19v-2.5M6.75 19v-2.5"
+                    />
+                  </svg>
 
-                    <span>Size Guide</span>
-                  </a>
+                  <span>Size Guide</span>
+                </a>
               </div>
 
               <div className="flex flex-wrap gap-3">
@@ -249,11 +277,10 @@ const ProductDetail = () => {
                     onClick={() => setSelectedSize(item.size)}
                     disabled={item.quantity === 0}
                     className={`min-w-[60px] px-4 py-2 rounded-lg border text-sm font-medium transition-all duration-200
-                    ${
-                      selectedSize === item.size
+                    ${selectedSize === item.size
                         ? "bg-black text-white border-black shadow-md"
                         : "bg-white text-gray-700 border-gray-300 hover:border-black hover:text-black"
-                    }
+                      }
                     ${item.quantity === 0 ? "opacity-40 cursor-not-allowed" : ""}
                     `}
                   >
@@ -270,7 +297,7 @@ const ProductDetail = () => {
 
               </div>
 
-              
+
             </div>
 
             <hr className="border-t border-gray-300 my-5" />
@@ -296,11 +323,10 @@ const ProductDetail = () => {
               <button
                 disabled={selectedSizeStock === 0}
                 className={`py-3 px-10 rounded-full flex-1 transition duration-300
-                ${
-                  selectedSizeStock === 0
+                ${selectedSizeStock === 0
                     ? "bg-gray-300 cursor-not-allowed text-gray-500"
                     : "bg-black text-white hover:bg-gray-800"
-                }`}
+                  }`}
                 onClick={handleAddToCart}
               >
                 {selectedSizeStock === 0 ? "Out of stock" : "Add to cart"}

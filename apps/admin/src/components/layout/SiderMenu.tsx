@@ -1,7 +1,8 @@
 import {
   FileTextOutlined,
   ShoppingOutlined,
-  UserOutlined
+  UserOutlined,
+  ClockCircleOutlined
 } from "@ant-design/icons";
 import { Menu } from "antd";
 import { Link, useLocation } from "react-router-dom";
@@ -55,6 +56,10 @@ const SiderMenu = ({ collapsed }: SiderMenuProps) => {
 
         <Menu.Item key="/products/list" icon={<ShoppingOutlined />}>
           <Link to="/products/list">Product List</Link>
+        </Menu.Item>
+
+        <Menu.Item key="/flash-sale" icon={<ClockCircleOutlined />}>
+          <Link to="/flash-sale">Flash Sale</Link>
         </Menu.Item>
 
         <Menu.Item key="/orders/list" icon={<FileTextOutlined />}>

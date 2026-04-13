@@ -73,7 +73,7 @@ const baseModel = (model) => ({
   },
 
   countDocuments: async (filter) => {
-    return await Model.countDocuments(filter);
+    return await model.countDocuments(filter);
   },
 
 

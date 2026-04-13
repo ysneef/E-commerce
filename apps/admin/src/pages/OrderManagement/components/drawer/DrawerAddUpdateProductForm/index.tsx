@@ -30,10 +30,10 @@ const DrawerAddUpdateProductForm: React.FC<DrawerAddUpdateProductFormProps> = ({
       setImageList(
         initialValues.image
           ? initialValues.image.map((url, index) => ({
-              uid: String(index),
-              url,
-              name: `Hình ${index + 1}`,
-            }))
+            uid: String(index),
+            url,
+            name: `Hình ${index + 1}`,
+          }))
           : []
       );
     } else {
@@ -77,7 +77,7 @@ const DrawerAddUpdateProductForm: React.FC<DrawerAddUpdateProductFormProps> = ({
     if (initialValues?._id) {
       (values as any)._id = initialValues._id;
     }
-    
+
     onSubmit(values);
     setLoading(false)
   };
@@ -91,10 +91,6 @@ const DrawerAddUpdateProductForm: React.FC<DrawerAddUpdateProductFormProps> = ({
 
         <Form.Item name="price" label="Price" rules={[{ required: true, message: "Please enter price" }]}>
           <InputNumber className="w-full" min={0} placeholder="Nhập giá" addonAfter="$" />
-        </Form.Item>
-
-        <Form.Item name="discountPercent" label="Discount (%)">
-          <InputNumber className="w-full" min={0} max={100} placeholder="0" />
         </Form.Item>
 
         <Form.Item name="brand" label="Brand" rules={[{ required: true, message: "Please select brand!" }]}>
@@ -128,7 +124,7 @@ const DrawerAddUpdateProductForm: React.FC<DrawerAddUpdateProductFormProps> = ({
           <Input.TextArea placeholder="Enter product description" rows={4} />
         </Form.Item>
 
-        
+
         <Form.Item
           name="status"
           label="Status"
@@ -149,9 +145,9 @@ const DrawerAddUpdateProductForm: React.FC<DrawerAddUpdateProductFormProps> = ({
 
         <div className="flex justify-end gap-2 sticky bottom-0">
           <Button onClick={onClose}>Cancel</Button>
-          <Button 
-            loading={loading} 
-            type="primary" 
+          <Button
+            loading={loading}
+            type="primary"
             htmlType="submit"
           >
             {initialValues ? "Update" : "Add"}

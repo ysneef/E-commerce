@@ -7,6 +7,7 @@ import UserManagement from "../../pages/UserManagement"
 import { ConfigProvider } from "antd"
 import ProductManagement from "../../pages/productManagement"
 import OrderManagement from "../../pages/OrderManagement"
+import FlashSaleManagement from "../../pages/FlashSaleManagement"
 
 const Router = () => {
   return (
@@ -36,6 +37,7 @@ const Router = () => {
                     <Route path="/customers/list" element={<UserManagement />} />
                     <Route path="/products/list" element={<ProductManagement />} />
                     <Route path="/orders/list" element={<OrderManagement />} />
+                    <Route path="/flash-sale" element={<FlashSaleManagement />} />
                   </Routes>
                 </LayoutWrapper>
               </PrivateRoute>

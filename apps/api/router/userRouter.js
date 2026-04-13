@@ -9,6 +9,8 @@ import {
   manageCartItem,
   registerUser,
   updateUserProfile,
+  forgotPassword,
+  resetPassword,
 } from "../controllers/userController.js";
 import JwtUtil from "../utils/JwtUtil.js";
 
@@ -22,5 +24,8 @@ router.post("/cart", JwtUtil.checkToken, manageCartItem);
 router.get("/me", JwtUtil.checkToken, getUserProfile);
 router.get("/get", JwtUtil.checkToken, getUserByPayload);
 router.put("/:id", JwtUtil.checkToken, updateUserProfile);
+
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 
 export default router;

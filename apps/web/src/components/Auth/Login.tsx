@@ -1,12 +1,13 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons"
-import { Button, Card, Form, Input, notification } from "antd"
+import { Button, Card, Checkbox, Form, Input, notification } from "antd"
 import _ from "lodash"
 import React from "react"
-import { useLocation } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { LoginFormValues, UserApi } from "../../api/userApi"
 
 const Login: React.FC = () => {
   const location = useLocation()
+  const navigate = useNavigate()
   const [api, contextHolder] = notification.useNotification()
 
   const urlParams = new URLSearchParams(location.search)
@@ -30,7 +31,8 @@ const Login: React.FC = () => {
           // }
 
           const path = from === "/" ? "" : from
-          window.location.href = `http://localhost:3000${path}`
+          const baseUrl = import.meta.env.VITE_WEB_BASE_URL || window.location.origin
+          window.location.href = `${baseUrl}${path}`
         } else {
           api.error({
             message: "Error",
@@ -40,7 +42,7 @@ const Login: React.FC = () => {
       } else {
         api.error({
           message: "Error",
-          description: "Invalid account",
+          description: response.message || "Invalid account",
         })
       }
     } catch (error) {
@@ -52,9 +54,9 @@ const Login: React.FC = () => {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-96 shadow-lg rounded-2xl p-6">
-        <h2 className="text-2xl font-bold text-center mb-4">Login</h2>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+      <Card className="max-w-[400px] w-full shadow-2xl rounded-2xl p-8 mb-4">
+        <h2 className="text-3xl font-extrabold text-center mb-6">Login</h2>
         <Form
           name="login"
           initialValues={{ remember: true }}
@@ -75,16 +77,22 @@ const Login: React.FC = () => {
             <Input.Password prefix={<LockOutlined />} placeholder="Password" />
           </Form.Item>
 
-          {/* <Form.Item>
+          <Form.Item>
             <div className="flex justify-between">
               <Form.Item name="remember" valuePropName="checked" noStyle>
                 <Checkbox>Remember me</Checkbox>
               </Form.Item>
-              <a className="text-blue-500 hover:underline" href="#">
+              <a
+                className="text-blue-500 hover:underline cursor-pointer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/forgot-password");
+                }}
+              >
                 Forgot password?
               </a>
             </div>
-          </Form.Item> */}
+          </Form.Item>
 
           <Form.Item>
             <Button type="primary" htmlType="submit" className="w-full">

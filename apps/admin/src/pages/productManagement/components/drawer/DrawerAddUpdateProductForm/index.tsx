@@ -7,20 +7,20 @@ import { uploadImageToCloudinary } from "../../../../../Utils/Funtions";
 
 const sizeMap: Record<string, string[]> = {
   men: [
-    "EU 38","EU 38.5","EU 39","EU 39.5","EU 40",
-    "EU 40.5","EU 41","EU 41.5","EU 42","EU 42.5",
-    "EU 43","EU 43.5","EU 44","EU 44.5","EU 45",
-    "EU 45.5","EU 46","EU 47"
+    "EU 38", "EU 38.5", "EU 39", "EU 39.5", "EU 40",
+    "EU 40.5", "EU 41", "EU 41.5", "EU 42", "EU 42.5",
+    "EU 43", "EU 43.5", "EU 44", "EU 44.5", "EU 45",
+    "EU 45.5", "EU 46", "EU 47"
   ],
   women: [
-    "EU 35","EU 35.5","EU 36","EU 36.5","EU 37",
-    "EU 37.5","EU 38","EU 38.5","EU 39","EU 39.5",
-    "EU 40","EU 40.5","EU 41","EU 41.5","EU 42"
+    "EU 35", "EU 35.5", "EU 36", "EU 36.5", "EU 37",
+    "EU 37.5", "EU 38", "EU 38.5", "EU 39", "EU 39.5",
+    "EU 40", "EU 40.5", "EU 41", "EU 41.5", "EU 42"
   ],
   kids: [
-    "EU 21","EU 22","EU 23","EU 24","EU 25",
-    "EU 26","EU 27","EU 28","EU 29","EU 30",
-    "EU 31","EU 32","EU 33","EU 34","EU 35"
+    "EU 21", "EU 22", "EU 23", "EU 24", "EU 25",
+    "EU 26", "EU 27", "EU 28", "EU 29", "EU 30",
+    "EU 31", "EU 32", "EU 33", "EU 34", "EU 35"
   ]
 };
 
@@ -55,7 +55,10 @@ const DrawerAddUpdateProductForm: React.FC<DrawerAddUpdateProductFormProps> = ({
       setImageList(initialValues.image || []);
 
       if (initialValues?.category) {
-        setSelectedCategory(initialValues.category.toLowerCase());
+        const categoryStr = typeof initialValues.category === 'object' 
+          ? (initialValues.category as any).name || '' 
+          : String(initialValues.category);
+        setSelectedCategory(categoryStr.toLowerCase());
       }
 
     } else {
@@ -218,9 +221,9 @@ const DrawerAddUpdateProductForm: React.FC<DrawerAddUpdateProductFormProps> = ({
                         options={
                           selectedCategory
                             ? sizeMap[selectedCategory]?.map((s) => ({
-                                label: s,
-                                value: s,
-                              }))
+                              label: s,
+                              value: s,
+                            }))
                             : []
                         }
                       />

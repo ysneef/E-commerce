@@ -188,7 +188,7 @@ const ProductManagement = () => {
         </Popover>
       ),
     },
-    
+
     {
       title: "Sizes",
       dataIndex: "sizes",
@@ -233,28 +233,38 @@ const ProductManagement = () => {
       ),
     },
     {
-      title: "Original Price",
+      title: "Price",
       dataIndex: "price",
       key: "price",
       width: 130,
       render: (price: number) => <div>{formatNumber(price)} USD</div>,
     },
+
     {
       title: "Discount (%)",
       dataIndex: "discountPercent",
       key: "discountPercent",
       align: "center" as any,
       width: 120,
+      render: (discountPercent: number) => (
+        <Tag color="red">{discountPercent || 0}%</Tag>
+      ),
     },
     {
       title: "Discount Price",
-      dataIndex: "discountPrice",
       key: "discountPrice",
       width: 150,
-      render: (discountPrice: number) => (
-        <div>{formatNumber(discountPrice)} USD</div>
-      ),
+      render: (_: any, record: any) => {
+        const originalPrice = record.price || 0;
+        const discountPercent = record.discountPercent || 0;
+        const finalPrice = record.discountPrice !== undefined && record.discountPrice !== 0 && record.discountPrice !== originalPrice
+          ? record.discountPrice 
+          : originalPrice - (originalPrice * discountPercent) / 100;
+          
+        return <div className="text-red-500 font-semibold">{formatNumber(finalPrice)} USD</div>;
+      },
     },
+
     {
       title: "Brand",
       dataIndex: "brand",

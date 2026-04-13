@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { AdminApi } from "../../api/apiRequest"
 
 interface LoginFormValues {
-  username: string
+  userName: string
   password: string
 }
 
@@ -30,22 +30,27 @@ const Login: React.FC = () => {
   const onFinish = async (values: LoginFormValues) => {
     console.log("Login:", values)
     const responese = await getUser(values)
-    if(responese?.success){
+    if (responese?.success) {
       if (!_.isEmpty(responese) && responese.user.role === "admin") {
         navigate(from, { replace: true })
+      } else {
+        api.error({
+          message: "Error",
+          description: "Invalid account or password",
+        });
       }
-    }else{
+    } else {
       api.error({
         message: "Error",
-        description: "Invalid account or password",
+        description: responese?.message || "Invalid account or password",
       });
     }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-96 shadow-lg rounded-2xl p-6">
-        <h2 className="text-2xl font-bold text-center mb-4">Login</h2>
+    <div className="flex items-center justify-center min-h-screen bg-gray-200">
+      <Card className="w-[380px] shadow-xl rounded-[1.5rem] p-10">
+        <h2 className="text-3xl font-bold text-center mb-6">Login</h2>
         <Form
           name="login"
           initialValues={{ remember: true }}

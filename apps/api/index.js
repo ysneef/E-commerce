@@ -3,6 +3,8 @@ import userRoutes from "./router/userRouter.js";
 import productRoutes from "./router/productRouter.js";
 import orderRoutes from "./router/orderRouter.js";
 import reviewRoutes from "./router/reviewRoute.js";
+import flashSaleRoutes from "./router/flashSaleRouter.js";
+import chatRoutes from "./router/chatRouter.js";
 import errorHandler from "./middleware/errorHandler.js";
 import dbConnect from "./config/dbConnect.js";
 import cors from "cors";
@@ -45,12 +47,17 @@ app.use(cookieParser());
 app.use(helmet());
 app.use(morgan("dev"));
 
+import stripeRoutes from "./router/stripeRouter.js";
+
 app.use("/api/dashboard", dashboardRoute);
 
 app.use("/api/users", userRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/flash-sale", flashSaleRoutes);
+app.use("/api/stripe", stripeRoutes);
+app.use("/api/chat", chatRoutes);
 
 app.use(errorHandler);
 

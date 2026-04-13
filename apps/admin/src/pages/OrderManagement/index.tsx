@@ -5,7 +5,6 @@ import { get } from "lodash"
 import moment from "moment"
 import { useState } from "react"
 import { useAsyncRetry } from "react-use"
-import DrawerViewJson from "../../components/DrawerViewJson"
 import { InfoList } from "../../components/InfoList"
 import OrderApi from "./api/order.api"
 import DrawerProductDetail from "./components/drawer/DrawerProductDetail"
@@ -17,7 +16,7 @@ const { Option } = Select;
 const initPayload = {
   page: 1,
   pageSize: 5,
-  sortBy: "createdAt", 
+  sortBy: "createdAt",
   sortOrder: "desc",
 }
 
@@ -27,18 +26,14 @@ const OrderManagement = () => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<TOrder | any>(null);
 
-  const handleViewJson = (order: TOrder) => {
-    const productDetails = order.items.map((item) => {
-      const productInfo = get(value, ['moreInfo', 'products', item._id], null);
-      return productInfo ? { ...item, ...productInfo } : item;
-    });
-    setSelectedOrder({ ...order, items: productDetails });
-    setDrawerVisible(true);
-  };
-
-  const handleCloseDrawer = () => {
-    setDrawerVisible(false);
-    setSelectedOrder(null);
+  const handleUpdateStatus = async (id: string, newStatus: string) => {
+    try {
+      await OrderApi.updateOrder(id, { status: newStatus });
+      notification.success({ message: "Update status successfully" });
+      retry();
+    } catch (error: any) {
+      notification.error({ message: error.message || "Failed to update status" });
+    }
   };
 
   const [productDrawerVisible, setProductDrawerVisible] = useState(false);
@@ -133,7 +128,7 @@ const OrderManagement = () => {
       dataIndex: "user",
       key: "user",
       width: 250,
-      render: (user: User) =>{
+      render: (user: User) => {
         return (
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <Avatar src={user?.avatar} size={40} />
@@ -150,8 +145,8 @@ const OrderManagement = () => {
       dataIndex: "user",
       key: "user",
       width: 120,
-      render: (user: User) =>(
-        <div>{user.phone||"No data"}</div>
+      render: (user: User) => (
+        <div>{user.phone || "No data"}</div>
       )
     },
     {
@@ -215,25 +210,28 @@ const OrderManagement = () => {
       )
     },
     {
-      title: "Action",
-      key: "action",
+      title: "Status",
+      key: "status",
       fixed: "right" as const,
-      width: 100,
-      align : "center" as any,
+      width: 140,
+      align: "center" as any,
       render: (_: any, record: TOrder) => (
-        <Tooltip title="View JSON">
-          <Button
-            icon={<EyeOutlined />}
-            onClick={() => handleViewJson(record)}
-            type="text"
-            className="text-blue-500 hover:text-blue-700"
-          >
-          </Button>
-        </Tooltip>
+        <Select
+          defaultValue={record.status || "pending"}
+          style={{ width: 120 }}
+          onChange={(val) => handleUpdateStatus(record._id, val)}
+          options={[
+            { value: "pending", label: "Pending" },
+            { value: "processing", label: "Processing" },
+            { value: "shipped", label: "Shipped" },
+            { value: "delivered", label: "Delivered" },
+            { value: "cancelled", label: "Cancelled" },
+          ]}
+        />
       ),
     },
   ];
-  
+
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-lg">
@@ -261,7 +259,7 @@ const OrderManagement = () => {
               <Option value="createdAt">Created Date</Option>
 
             </Select>
-            
+
             <Select
               defaultValue={criteria.payload.sortOrder}
               style={{ width: 120 }}
@@ -294,7 +292,6 @@ const OrderManagement = () => {
         onChange={handleTableChange}
       />
       {contextHolder}
-      <DrawerViewJson isOpen={drawerVisible} onClose={handleCloseDrawer} data={selectedOrder} />
       <DrawerProductDetail visible={productDrawerVisible} onClose={handleCloseProductDrawer} products={selectedOrder?.items} />
 
     </div>

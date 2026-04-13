@@ -79,6 +79,16 @@ const Orders = () => {
 
                 <Descriptions column={2} bordered size="small">
 
+                  <Descriptions.Item label="Shipping Address">
+                    <span className="text-sm text-gray-500">
+                      {order.shippingAddress}
+                    </span>
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Total Items">
+                    {totalItems}
+                  </Descriptions.Item>
+
                   <Descriptions.Item label="Order Date">
                     {moment(order.createdAt).format('DD/MM/YYYY HH:mm')}
                   </Descriptions.Item>
@@ -98,9 +108,16 @@ const Orders = () => {
                       -{formatNumber(order.discount)} $
                     </span>
                   </Descriptions.Item>
-                  
-                  <Descriptions.Item label="Total Items">
-                    {totalItems}
+
+                  <Descriptions.Item label="Status">
+                    <Tag color={
+                      order.status === 'delivered' ? 'green' :
+                        order.status === 'cancelled' ? 'red' :
+                          order.status === 'shipped' ? 'blue' :
+                            'orange'
+                    }>
+                      {order.status ? order.status.toUpperCase() : 'PENDING'}
+                    </Tag>
                   </Descriptions.Item>
 
                   <Descriptions.Item label="Total">
@@ -109,12 +126,9 @@ const Orders = () => {
                     </span>
                   </Descriptions.Item>
 
-                  <Descriptions.Item label="Shipping Address">
-                    <span className="text-sm text-gray-500">
-                      {order.shippingAddress}
-                    </span>
-                  </Descriptions.Item>
+
                 </Descriptions>
+
 
                 <Divider orientation="left" className="text-3xl font-bold mb-5 text-teal-600">
                   Product List
@@ -171,44 +185,45 @@ const Orders = () => {
                       ),
                     },
                     {
-                      title: 'Price',
-                      dataIndex: 'price',
+                      title: 'Unit Price',
                       key: 'price',
                       align: 'center',
-                      render: (price: number) => (
-                        <span className="text-gray-700">
-                          {formatNumber(price)} $
-                        </span>
-                      ),
-                    },
-                    {
-                      title: 'Discount',
-                      dataIndex: 'discountPercent',
-                      key: 'discountPercent',
-                      align: 'center',
-                      render: (percent: number) => (
-                        percent ? (
-                          <Tag color="red">-{percent}%</Tag>
-                        ) : (
-                          <span>-</span>
-                        )
-                      ),
-                    },
-                    {
-                      title: 'Final Price',
-                      dataIndex: 'discountPrice',
-                      key: 'discountPrice',
-                      align: 'center',
-                      render: (_: number, record: any) => {
-
-                        const finalPrice =
-                          record.discountPrice ??
-                          record.price - (record.price * (record.discountPercent ?? 0)) / 100;
+                      render: (_: any, record: any) => {
+                        const originalPrice = record.price;
+                        const finalPrice = record.discountPrice ?? originalPrice;
+                        const isDiscounted = finalPrice < originalPrice;
 
                         return (
-                          <span className="text-green-600 font-semibold">
-                            {formatNumber(finalPrice)} $
-                          </span>
+                          <div className="flex flex-col items-center">
+                            <span className="text-gray-900 font-semibold">
+                              {formatNumber(finalPrice)} $
+                            </span>
+                            {isDiscounted && (
+                              <span className="text-xs text-gray-400 line-through">
+                                {formatNumber(originalPrice)} $
+                              </span>
+                            )}
+                          </div>
+                        );
+                      },
+                    },
+                    {
+                      title: 'Promo',
+                      key: 'promo',
+                      align: 'center',
+                      render: (_: any, record: any) => {
+                        const originalPrice = record.price;
+                        const finalPrice = record.discountPrice ?? originalPrice;
+                        const isFlashSale = finalPrice < originalPrice && (!record.discountPercent || record.discountPercent === 0);
+
+                        if (isFlashSale) {
+                          return <Tag color="purple" className="m-0 font-bold border-0">⚡ FLASH</Tag>;
+                        }
+
+                        return record.discountPercent ? (
+                          <Tag color="red" className="m-0 border-0 font-bold">-{record.discountPercent}%</Tag>
+                        ) : (
+                          <span className="text-gray-400">-</span>
                         );
                       },
                     },

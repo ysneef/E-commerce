@@ -3,6 +3,9 @@ import { productModel } from "../models/productModel.js";
 import userModel from "../models/userModel.js";
 import BaseController from "./BaseController.js";
 
+import FlashSale from "../models/flashSaleModel.js";
+import { sendOrderEmail } from "../utils/SendOrderEmail.js";
+
 export const createOrder = async (req, res) => {
   try {
     const { userId, items, shippingAddress, paymentMethod } = req.body;
@@ -20,6 +23,13 @@ export const createOrder = async (req, res) => {
         .status(404)
         .json({ success: false, message: "User does not exist!" });
     }
+
+    const now = new Date();
+    const activeSale = await FlashSale.findOne({
+      startTime: { $lte: now },
+      endTime: { $gte: now },
+      status: true,
+    });
 
     let totalPrice = 0;
     let totalDiscount = 0;
@@ -54,9 +64,21 @@ export const createOrder = async (req, res) => {
       sizeExist.quantity -= item.quantity;
       await product.save();
 
+      let discountAmount = (product.price * product.discountPercent) / 100;
+      let discountedPrice = product.price - discountAmount;
+      let activeDiscountPercent = product.discountPercent;
 
-      const discountAmount = (product.price * product.discountPercent) / 100;
-      const discountedPrice = product.price - discountAmount;
+      if (activeSale && activeSale.products?.length > 0) {
+        const saleProduct = activeSale.products.find(
+          (p) => p.productId === product._id.toString()
+        );
+        if (saleProduct) {
+          discountedPrice = product.price - (product.price * saleProduct.flashSalePercent / 100);
+          discountAmount = product.price - discountedPrice;
+          activeDiscountPercent = 0; // Or whatever signifies a flash sale in frontend
+        }
+      }
+
       const itemTotal = discountedPrice * item.quantity;
 
       totalPrice += itemTotal;
@@ -67,9 +89,9 @@ export const createOrder = async (req, res) => {
         name: product.name,
         image: product.image,
         quantity: item.quantity,
-        discountPercent: product.discountPercent,
-        discountPrice: product.discountPrice,
-        price: product.price * item.quantity,
+        price: product.price,
+        discountPercent: activeDiscountPercent,
+        discountPrice: discountedPrice,
         totalPrice: itemTotal,
         size: item.size,
       });
@@ -91,10 +113,13 @@ export const createOrder = async (req, res) => {
       paymentMethod,
     });
 
-    if(newOrder){
+    if (newOrder) {
       userInfo.order.push(newOrder._id);
       userInfo.cart = [];
       await userInfo.save();
+
+      // Send Order Confirmation Email
+      sendOrderEmail(userInfo.email, userInfo.userName, 'CREATED', newOrder).catch(console.error);
     }
 
     res.status(201).json({ success: true, data: newOrder });
@@ -115,6 +140,11 @@ export const updateOrder = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Order does not exist" });
+    }
+
+    // If order status was updated, notify the user via email
+    if (req.body.status && updatedOrder.user && updatedOrder.user.email) {
+      sendOrderEmail(updatedOrder.user.email, updatedOrder.user.userName, 'STATUS_UPDATED', updatedOrder).catch(console.error);
     }
 
     res.status(200).json({ success: true, data: updatedOrder });
@@ -160,7 +190,7 @@ export const getOrdersByUserId = async (req, res) => {
     const orders = await orderModel
       .findAll({ 'user._id': id })
       .sort({ createdAt: -1 });
-    console.log("orders:",orders)
+    console.log("orders:", orders)
     if (!orders.length) {
       return res.status(200).json({
         success: true,

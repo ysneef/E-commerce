@@ -8,18 +8,20 @@ import { useDispatch } from "react-redux";
 const isAuthenticated = async (dispatch: any) => {
 
   try {
-    const newUser = await AdminApi.axiosGet({
+    const response = await AdminApi.axiosGet({
       data: {
         endpoint: "/api/users/me",
       },
     });
 
-    const hasUser = !_.isEmpty(newUser.data);
-    if(hasUser){
-      dispatch(setUser(newUser.data))
+    if (response && response.status === 200 && !_.isEmpty(response.data)) {
+      if (response.data.role === "admin") {
+        dispatch(setUser(response.data));
+        return true;
+      }
     }
 
-    return !_.isEmpty(newUser);
+    return false;
   } catch (error) {
     console.error("Error during authentication check", error);
     return false;

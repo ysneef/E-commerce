@@ -77,12 +77,12 @@ function Header() {
   const menu = (
     <Menu onClick={handleMenuClick}>
       <Menu.Item key="edit" icon={<UserOutlined />}>Edit Profile</Menu.Item>
-      <Menu.Item key="logout" icon={<LogoutOutlined />}>Logout</Menu.Item>
       {(user?.orders||[])?.length > 0 && (
         <Menu.Item key="orders" icon={<UserOutlined />}>
           Orders
         </Menu.Item>
       )}
+      <Menu.Item key="logout" icon={<LogoutOutlined />}>Logout</Menu.Item>
     </Menu>
   );
 

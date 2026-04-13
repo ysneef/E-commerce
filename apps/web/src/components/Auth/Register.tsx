@@ -51,9 +51,9 @@ function Register() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-96 shadow-lg rounded-2xl p-6">
-        <h2 className="text-2xl font-bold text-center mb-4">Register</h2>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+      <Card className="max-w-lg w-full shadow-2xl rounded-2xl p-10 pb-6">
+        <h2 className="text-4xl font-extrabold text-center mb-8">Register</h2>
         <Form
           form={form}
           name="register"

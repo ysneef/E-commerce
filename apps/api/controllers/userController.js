@@ -3,6 +3,7 @@ import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import JwtUtil from "../utils/JwtUtil.js";
 import BaseController from "./BaseController.js";
+import ForgotPassword from "../utils/ForgotPassword.js";
 
 const hashPassword = (password) => {
   return crypto.createHash("md5").update(password).digest("hex");
@@ -244,7 +245,6 @@ export const addToCart = async (req, res) => {
       quantity,
       image,
       price,
-      discountPercent,
       size,
     } = req.body;
 
@@ -270,6 +270,7 @@ export const addToCart = async (req, res) => {
         image,
         price,
         discountPercent,
+        discountPrice,
         size,
       });
     }
@@ -303,6 +304,7 @@ export const manageCartItem = async (req, res) => {
       image,
       price,
       discountPercent,
+      discountPrice,
       size,
       action,
     } = req.body;
@@ -331,6 +333,7 @@ export const manageCartItem = async (req, res) => {
           image,
           price,
           discountPercent,
+          discountPrice,
           size,
         });
       }
@@ -362,13 +365,12 @@ export const manageCartItem = async (req, res) => {
 
     res.json({
       success: true,
-      message: `Cart ${
-        action === "add"
+      message: `Cart ${action === "add"
           ? "added"
           : action === "update"
-          ? "updated"
-          : "deleted"
-      } successfully`,
+            ? "updated"
+            : "deleted"
+        } successfully`,
       cart: updatedUser.cart,
       totalCart: updatedUser.cart.length,
     });
@@ -378,5 +380,68 @@ export const manageCartItem = async (req, res) => {
       message: "Error handling cart",
       error: error.message,
     });
+  }
+};
+
+const generateOTP = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await userModel.findOneByCondition({ email });
+
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
+    const otp = generateOTP();
+    const token = crypto.randomBytes(32).toString("hex");
+
+    user.resetPasswordOTP = otp;
+    user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 mins
+
+    await user.save();
+
+    await ForgotPassword(user.email, token, otp);
+
+    res.json({
+      success: true,
+      message: "OTP has been sent to your email",
+      token: token
+    });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.json({ success: false, message: "Server error", error: error.message });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { email, otp, newPassword, token } = req.body;
+
+    // Check if token and otp are valid
+    const user = await userModel.findOneByCondition({
+      email,
+      resetPasswordOTP: otp,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.json({ success: false, message: "Invalid or expired OTP" });
+    }
+
+    // Hash the new password using the same format as registerUser
+    user.password = hashPassword(`${newPassword}_pass`);
+    user.resetPasswordOTP = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    res.json({ success: true, message: "Password has been successfully reset" });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    res.json({ success: false, message: "Server error", error: error.message });
   }
 };

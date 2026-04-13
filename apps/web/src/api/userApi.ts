@@ -2,7 +2,7 @@ import { RegisterFormValues } from '../components/Auth/Register';
 import { ClientApi } from './apiRequest';
 
 export type LoginFormValues = {
-  username: string
+  userName: string
   password: string
 }
 
@@ -25,17 +25,17 @@ export const UserApi = {
     try {
       const response = await ClientApi.axiosPost({
         data: {
-        endpoint: "/api/users/login",
+          endpoint: "/api/users/login",
           params: payload,
         },
       });
       return response.data
 
-    } catch (error) {
-      return {};
+    } catch (error: any) {
+      return error?.data || { success: false, message: "An error occurred during login." };
     }
   },
-  
+
   async register(payload: RegisterFormValues) {
     try {
       const response = await ClientApi.axiosPost({
@@ -65,6 +65,34 @@ export const UserApi = {
       return response.data;
     } catch (error) {
       return error;
+    }
+  },
+
+  async forgotPassword(email: string) {
+    try {
+      const response = await ClientApi.axiosPost({
+        data: {
+          endpoint: '/api/users/forgot-password',
+          params: { email },
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return { success: false, message: 'Lỗi Call API' };
+    }
+  },
+
+  async resetPassword(payload: any) {
+    try {
+      const response = await ClientApi.axiosPost({
+        data: {
+          endpoint: '/api/users/reset-password',
+          params: payload,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return { success: false, message: 'Lỗi Call API' };
     }
   },
 };

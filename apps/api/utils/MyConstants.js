@@ -5,10 +5,8 @@ const MyConstants = {
   DB_DATABASE: 'shoppingonline',
   JWT_SECRET: 'vohuynhnhuy',
   JWT_EXPIRES: '10h',
-  EMAIL_USER: 'ysnef3006@gmail.com',
-  EMAIL_PASS: 'vniw socy zugt aznp'
+  EMAIL_USER: 'vohuynhnhuy30@gmail.com',
+  EMAIL_PASS: 'eqzs zdez nlhi rail'
 };
 
 export default MyConstants
-
-//mongodb+srv://vohuynhnhuy:vohuynhnhuy@e-commerce.f6u78ea.mongodb.net/

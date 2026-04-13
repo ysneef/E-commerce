@@ -4,7 +4,6 @@ export type Product = {
   description: string;
   price: number;
   discountPercent: number;
-  discountPrice: number;
   brand: string;
   rating: number;
 
@@ -16,6 +15,12 @@ export type Product = {
   category: {
     id: string;
     name: string;
+  };
+
+  flashSaleInfo?: {
+    price: number;
+    endTime: string;
+    saleName: string;
   };
 
   image: string[];

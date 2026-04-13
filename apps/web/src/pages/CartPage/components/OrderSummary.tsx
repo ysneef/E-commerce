@@ -25,6 +25,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ cartItems = [] }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [shippingAddress, setShippingAddress] = useState('');
   const [paymentMethod, setPaymentMethod] = useState("COD");
+  const apiBase = (import.meta.env.VITE_BACKEND_API_ENDPOINT || "").replace(/\/$/, "");
 
   const safeCartItems = Array.isArray(cartItems) ? cartItems : [];
 
@@ -77,6 +78,37 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ cartItems = [] }) => {
     }
 
     try {
+      if (paymentMethod === "Credit Card") {
+        if (!apiBase) {
+          return api.error({
+            message: "Payment unavailable",
+            description: "Payment is not configured. Please choose Cash on Delivery.",
+          });
+        }
+
+        // Intercept for Stripe Checkout
+        const items = safeCartItems.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          size: item.size
+        }));
+
+        const res = await fetch(`${apiBase}/api/stripe/create-checkout-session`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ items, shippingAddress })
+        });
+        
+        const data = await res.json();
+        
+        if (data.success && data.url) {
+            window.location.href = data.url; 
+        } else {
+            api.error({ message: "Stripe error", description: data.message });
+        }
+        return;
+      }
+
       const payload: OrderPayload = {
         userId: user._id,
         items: safeCartItems.map((item) => ({

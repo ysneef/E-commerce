@@ -25,6 +25,24 @@ coverage
 .env
 .env*
 *.local
+.env.*.local
+.envrc
+.envrc.local
+
+# Secrets / credentials
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.jks
+*.keystore
+*.kdbx
+*.credentials
+*secret*
+*secrets*
+*token*
 
 # OS files
 .DS_Store
@@ -47,6 +65,11 @@ Thumbs.db
 tmp
 temp
 .cache
+
+# Replit
+.replit
+replit.nix
+.config/
 
 node_modules/
 .env
