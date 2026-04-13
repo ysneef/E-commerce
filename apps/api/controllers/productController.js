@@ -11,18 +11,20 @@ export const getProductById = async (req, res) => {
         .json({ success: false, message: "Product does not exist" });
     }
 
-    // Check for active flash sale
+    // Check all active flash sales
     const now = new Date();
-    const activeSale = await FlashSale.findOne({
+    const activeSales = await FlashSale.find({
       startTime: { $lte: now },
       endTime: { $gte: now },
       status: true,
-      "products.productId": product._id,
+      "products.productId": product._id.toString(),
     });
 
     let productData = product.toObject ? product.toObject() : product;
 
-    if (activeSale) {
+    if (activeSales && activeSales.length > 0) {
+      // Find the first campaign that has this product
+      const activeSale = activeSales[0];
       const saleProduct = activeSale.products.find(
         (p) => p.productId === product._id.toString()
       );
@@ -281,14 +283,16 @@ export const getProductsByPayloadClient = BaseController.getDataByPayload(
       // Handle excludeFlashSale logic
       if (filters.excludeFlashSale === "true" || filters.excludeFlashSale === true) {
         const now = new Date();
-        const activeSale = await FlashSale.findOne({
+        const activeSales = await FlashSale.find({
           startTime: { $lte: now },
           endTime: { $gte: now },
           status: true,
         });
 
-        if (activeSale && activeSale.products?.length > 0) {
-          const saleProductIds = activeSale.products.map(p => p.productId);
+        if (activeSales && activeSales.length > 0) {
+          const saleProductIds = activeSales.reduce((acc, sale) => {
+            return acc.concat(sale.products.map(p => p.productId));
+          }, []);
           query._id = { $nin: saleProductIds };
         }
       }
@@ -307,27 +311,32 @@ export const getProductsByPayloadClient = BaseController.getDataByPayload(
     },
     extraProcessing: async (results) => {
       const now = new Date();
-      const activeSale = await FlashSale.findOne({
+      const activeSales = await FlashSale.find({
         startTime: { $lte: now },
         endTime: { $gte: now },
         status: true,
       });
 
-      if (!activeSale) return {};
+      if (!activeSales || activeSales.length === 0) return { data: results };
 
       const newData = results.map(product => {
         let productData = product.toObject ? product.toObject() : { ...product };
-        const saleProduct = activeSale.products.find(
-          (p) => p.productId === productData._id.toString()
-        );
+        
+        // Check if this product belongs to any active sale
+        for (const sale of activeSales) {
+          const saleProduct = sale.products.find(
+            (p) => p.productId === productData._id.toString()
+          );
 
-        if (saleProduct) {
-          const calculatedFlashPrice = productData.price - (productData.price * saleProduct.flashSalePercent / 100);
-          productData.flashSaleInfo = {
-            price: calculatedFlashPrice,
-            endTime: activeSale.endTime,
-            flashSaleName: activeSale.name,
-          };
+          if (saleProduct) {
+            const calculatedFlashPrice = productData.price - (productData.price * saleProduct.flashSalePercent / 100);
+            productData.flashSaleInfo = {
+              price: calculatedFlashPrice,
+              endTime: sale.endTime,
+              flashSaleName: sale.name,
+            };
+            break; // Stop at first found flash sale
+          }
         }
         return productData;
       });

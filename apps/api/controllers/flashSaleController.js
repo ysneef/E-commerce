@@ -23,13 +23,13 @@ const flashSaleController = {
   getActiveFlashSale: async (req, res) => {
     try {
       const now = new Date();
-      const result = await FlashSale.findOne({
+      const results = await FlashSale.find({
         startTime: { $lte: now },
         endTime: { $gte: now },
         status: true,
       }).populate("products.productId");
       
-      res.status(200).json({ success: true, data: result });
+      res.status(200).json({ success: true, data: results });
     } catch (error) {
       res.status(400).json({ success: false, message: error.message });
     }

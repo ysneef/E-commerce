@@ -26,7 +26,7 @@ const HomePage = () => {
   };
 
   const { loading: loadingProducts, value: products = [] } = useAsyncRetry(fetchProducts, []);
-  const { loading: loadingSale, value: activeSale } = useAsyncRetry(fetchActiveSale, []);
+  const { loading: loadingSale, value: activeSales = [] } = useAsyncRetry(fetchActiveSale, []);
 
   const loading = loadingProducts || loadingSale;
 
@@ -41,7 +41,7 @@ const HomePage = () => {
         </div>
       </section>
       <Brand />
-      {activeSale && <Sale sale={activeSale} />}
+      {activeSales && activeSales.length > 0 && <Sale sales={activeSales} />}
       {loading ? (
         <div className="mx-auto w-full max-w-screen-xl px-6 py-10">
           <div className="mb-4 h-6 w-48 animate-pulse rounded-full bg-white/70" />
