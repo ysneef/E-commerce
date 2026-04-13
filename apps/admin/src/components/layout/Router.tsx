@@ -23,7 +23,7 @@ const Router = () => {
         },
       }}
     >
-      <BrowserRouter>
+      <BrowserRouter basename="/admin">
         <Routes>
           <Route path="/login" element={<Login />} />
 
