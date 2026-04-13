@@ -292,7 +292,7 @@ const OrderManagement = () => {
         onChange={handleTableChange}
       />
       {contextHolder}
-      <DrawerProductDetail visible={productDrawerVisible} onClose={handleCloseProductDrawer} products={selectedOrder?.items} />
+      <DrawerProductDetail visible={productDrawerVisible} onClose={handleCloseProductDrawer} order={selectedOrder} />
 
     </div>
   )

@@ -1,79 +1,152 @@
-import { Drawer } from "antd";
-import { IProductOrder } from "../../../models/Product.model";
+import { Descriptions, Divider, Drawer, Steps, Table, Tag, Typography } from "antd";
+import { TOrder } from "../../../models/Product.model";
+import moment from "moment";
+import { formatNumber } from "@repo/ui";
 
+const { Title, Text } = Typography;
 
 interface DrawerProductDetailProps {
   visible: boolean;
   onClose: () => void;
-  products: IProductOrder[];
+  order: TOrder | null;
 }
 
-const DrawerProductDetail: React.FC<DrawerProductDetailProps> = ({ visible, onClose, products = [] }) => {
-  console.log("🚀 ~ products:", products)
+const statusSteps = ["pending", "processing", "shipped", "delivered"];
+
+const DrawerProductDetail: React.FC<DrawerProductDetailProps> = ({ visible, onClose, order }) => {
+  if (!order) return null;
+
+  const currentStatusIndex = statusSteps.indexOf(order.status || "pending");
+
+  const columns = [
+    {
+      title: "Product",
+      dataIndex: "name",
+      key: "name",
+      render: (text: string, record: any) => (
+        <div className="flex items-center gap-3">
+          <img
+            src={record.image?.[0] || "https://via.placeholder.com/50"}
+            alt={text}
+            className="w-12 h-12 object-cover rounded-md border"
+          />
+          <div>
+            <div className="font-semibold text-gray-800">{text}</div>
+            <Tag color="blue">Size: {record.size}</Tag>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Quantity",
+      dataIndex: "quantity",
+      key: "quantity",
+      align: "center" as const,
+      render: (q: number) => <span className="font-medium">{q}</span>,
+    },
+    {
+      title: "Unit Price",
+      dataIndex: "price",
+      key: "price",
+      align: "right" as const,
+      render: (p: number) => <span>{formatNumber(p)} $</span>,
+    },
+    {
+      title: "Total Price",
+      dataIndex: "totalPrice",
+      key: "totalPrice",
+      align: "right" as const,
+      render: (p: number) => <span className="font-bold text-blue-600">{formatNumber(p)} $</span>,
+    },
+  ];
+
   return (
     <Drawer
-      title="Product Details"
+      title={
+        <div className="flex items-center justify-between w-full pr-8">
+          <span>Order Details</span>
+          <Text type="secondary" className="text-sm font-normal">#{order._id}</Text>
+        </div>
+      }
       width={1000}
       open={visible}
       onClose={onClose}
       bodyStyle={{ padding: "24px" }}
     >
-      {products.length > 0 ? (
-        <div className="flex flex-col gap-6">
-          {products.map((item, index) => (
-            <div key={index} className="relative p-4 border rounded-lg">
-              {item.discountPercent > 0 && (
-                <span className="absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">
-                  -{item.discountPercent}%
-                </span>
-              )}
+      <div className="space-y-8">
+        {/* Order Status Steps */}
+        <section className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+          <Steps
+            current={currentStatusIndex}
+            items={[
+              { title: "Pending" },
+              { title: "Processing" },
+              { title: "Shipped" },
+              { title: "Delivered" },
+            ]}
+          />
+        </section>
 
-              <div className="flex gap-2 overflow-x-auto mb-4">
-                {item.image && item.image.length > 0 ? (
-                  item.image.map((img, imgIndex) => (
-                    <img
-                      key={imgIndex}
-                      src={img}
-                      alt={item.name}
-                      style={{ width: 400, height: 400, objectFit: "cover" }}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Customer & Shipping Info */}
+          <section>
+            <Title level={5} className="mb-4">Customer Information</Title>
+            <Descriptions column={1} bordered size="small">
+              <Descriptions.Item label="Customer Name">{order.user?.userName}</Descriptions.Item>
+              <Descriptions.Item label="Email">{order.user?.email}</Descriptions.Item>
+              <Descriptions.Item label="Phone">{order.user?.phone || "N/A"}</Descriptions.Item>
+            </Descriptions>
+          </section>
 
-                    />
-                  ))
-                ) : (
-                  <div className="w-20 h-20 bg-gray-200 rounded-md flex items-center justify-center text-gray-500 text-xs">
-                    No Image
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-800">{item.name}</h3>
-                  <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
-                </div>
-                <div>
-                  <div className="flex flex-col gap-1">
-                    <p className="text-sm text-gray-500">
-                      Total Price: {(item.price).toLocaleString()} $
-                    </p>
-
-                    <p className="text-lg font-bold text-blue-600">
-                      Final Price: {(item.totalPrice)?.toLocaleString()} $
-                    </p>
-                  </div>
-
-                </div>
-                <div>
-                  <span className="text-sm font-medium text-gray-700">Size: </span>
-                  <span className="text-sm text-gray-600">{item.size}</span>
-                </div>
-              </div>
-            </div>
-          ))}
+          <section>
+            <Title level={5} className="mb-4">Delivery & Payment</Title>
+            <Descriptions column={1} bordered size="small">
+              <Descriptions.Item label="Shipping Address">
+                <Text className="w-full break-words">{order.shippingAddress}</Text>
+              </Descriptions.Item>
+              <Descriptions.Item label="Payment Method">
+                <Tag color="cyan">{order.paymentMethod || "COD"}</Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="Order Date">
+                {moment(order.createdAt).format("DD/MM/YYYY HH:mm:ss")}
+              </Descriptions.Item>
+            </Descriptions>
+          </section>
         </div>
-      ) : (
-        <p className="text-center text-gray-500">No products available.</p>
-      )}
+
+        <Divider />
+
+        {/* Product Items Table */}
+        <section>
+          <Title level={5} className="mb-4">Order Items</Title>
+          <Table
+            dataSource={order.items}
+            columns={columns}
+            rowKey={(record, index) => `${record._id}-${index}`}
+            pagination={false}
+            className="border rounded-lg overflow-hidden"
+          />
+        </section>
+
+        {/* Order Summary */}
+        <section className="flex justify-end">
+          <div className="w-80 space-y-3 bg-gray-50 p-6 rounded-xl border border-gray-100">
+            <div className="flex justify-between items-center">
+              <Text type="secondary">Subtotal:</Text>
+              <Text className="font-semibold">{formatNumber(order.totalPrice + (order.discount || 0))} $</Text>
+            </div>
+            <div className="flex justify-between items-center">
+              <Text type="secondary">Discount:</Text>
+              <Text className="font-semibold text-red-500">-{formatNumber(order.discount || 0)} $</Text>
+            </div>
+            <Divider className="my-2" />
+            <div className="flex justify-between items-center">
+              <Title level={4} className="m-0 text-blue-600">Total:</Title>
+              <Title level={4} className="m-0 text-blue-600 font-bold">{formatNumber(order.totalPrice)} $</Title>
+            </div>
+          </div>
+        </section>
+      </div>
     </Drawer>
   );
 };
