@@ -37,7 +37,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
   return (
     <>
       <Dropdown overlay={menu} trigger={["click"]}>
-        <Button type="primary">
+        <Button type="primary" size="large">
           <FilterOutlined /> Filter
         </Button>
       </Dropdown>
