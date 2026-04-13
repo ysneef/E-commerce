@@ -134,7 +134,7 @@ const ProductDetail = () => {
   }
 
   return (
-    <div className="max-w-screen-xl mx-auto pt-28 pb-7">
+    <div className="max-w-screen-xl mx-auto pt-28 pb-7 px-5">
       {/* Breadcrumb */}
       <div className="mb-5">
         <Breadcrumb
@@ -148,8 +148,8 @@ const ProductDetail = () => {
 
       </div>
 
-      <div className="w-full py-10 bg-white">
-        <div className="flex w-full gap-24 mb-5">
+      <div className="w-full py-10 bg-white rounded-3xl shadow-sm">
+        <div className="flex w-full gap-24 mb-5 px-5">
           {/* Product images */}
           <div className="flex gap-5 w-2/5">
             <div className="flex flex-col gap-5">
