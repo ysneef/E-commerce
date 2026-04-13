@@ -8,8 +8,7 @@
   ],
   "scripts": {
     "dev": "turbo run dev --parallel",
-    "build": "npm run build --workspace=apps/web && npm run build --workspace=apps/admin",
-    "start": "node apps/api/index.js",
+    "build": "turbo run build",
     "lint": "turbo run lint"
   },
   "devDependencies": {
