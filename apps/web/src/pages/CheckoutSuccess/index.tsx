@@ -34,11 +34,6 @@ const CheckoutSuccess = () => {
             }
 
             try {
-                if (!apiBase) {
-                    setStatus('error');
-                    setMessage('Payment verification is unavailable. Please contact support or use Cash on Delivery.');
-                    return;
-                }
 
                 // Verify session payment status
                 const verifyRes = await fetch(`${apiBase}/api/stripe/verify-session?session_id=${sessionId}`);
