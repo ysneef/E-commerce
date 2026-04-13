@@ -5,8 +5,7 @@ import { ProductApi } from '../../api/productApi';
 import Card from '../../components/Card';
 import Filter from './components/Filter';
 import { Link, useParams } from "react-router-dom";
-import Footer from "../../components/Layout/Footer";
-import Header from "../../components/Layout/Header";
+
 
 
 export interface Criteria {
@@ -73,8 +72,6 @@ const Category = () => {
 
   return (
     <>
-      <Header />
-
       <div className="max-w-screen-xl mx-auto pt-24 pb-7">
 
         {/* Breadcrumb */}
@@ -160,8 +157,6 @@ const Category = () => {
         </div>
 
       </div>
-
-      <Footer />
     </>
   );
 };
