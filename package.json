@@ -9,11 +9,8 @@
   "scripts": {
     "dev": "turbo run dev --parallel",
     "build": "turbo run build",
-    "lint": "turbo run lint",
     "start": "node apps/api/index.js",
-    "build": "turbo run build",
-    "lint": "turbo run lint",
-    "start": "cd apps/api && node index.js"
+    "lint": "turbo run lint"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.1",
