@@ -20,7 +20,9 @@ import qs from "qs";
 import cookieParser from 'cookie-parser';
 
 import dashboardRoute from "./router/dashboardRouter.js";
+import stripeRoutes from "./router/stripeRouter.js";
 
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -29,7 +31,11 @@ dbConnect();
 
 // Cấu hình CORS
 const corsOptions = {
-  origin: ['http://localhost:3000', 'http://localhost:3002'],
+  origin: [
+    'http://localhost:3000', 
+    'http://localhost:3002', 
+    'https://shoe-store--ysnef.replit.app'
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
@@ -37,6 +43,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
+
 app.use((req, res, next) => {
   const urlParts = req.url.split("?");
   if (urlParts.length > 1) {
@@ -49,13 +56,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        "img-src": ["'self'", "data:", "res.cloudinary.com"],
+        "connect-src": ["'self'", "api.stripe.com"],
+      },
+    },
+  })
+);
+
 app.use(morgan("dev"));
 
-import stripeRoutes from "./router/stripeRouter.js";
-
 app.use("/api/dashboard", dashboardRoute);
-
 app.use("/api/users", userRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/order", orderRoutes);
