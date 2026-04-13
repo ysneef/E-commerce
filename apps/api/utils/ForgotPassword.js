@@ -1,11 +1,12 @@
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import MyConstants from './MyConstants.js';
 dotenv.config();
 
 const ForgotPassword = async (email, token, otp) => {
     try {
-        const EMAIL_USER = process.env.EMAIL_USER;
-        const EMAIL_PASS = process.env.EMAIL_PASS;
+        const EMAIL_USER = process.env.EMAIL_USER || MyConstants.EMAIL_USER;
+        const EMAIL_PASS = process.env.EMAIL_PASS || MyConstants.EMAIL_PASS;
 
         if (!EMAIL_USER || !EMAIL_PASS) {
             throw new Error("Missing EMAIL_USER or EMAIL_PASS in environment variables");

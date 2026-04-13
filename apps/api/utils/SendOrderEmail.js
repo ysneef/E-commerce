@@ -1,11 +1,12 @@
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import MyConstants from './MyConstants.js';
 dotenv.config();
 
 export const sendOrderEmail = async (email, userName, type, orderData) => {
     try {
-        const EMAIL_USER = process.env.EMAIL_USER;
-        const EMAIL_PASS = process.env.EMAIL_PASS;
+        const EMAIL_USER = process.env.EMAIL_USER || MyConstants.EMAIL_USER;
+        const EMAIL_PASS = process.env.EMAIL_PASS || MyConstants.EMAIL_PASS;
 
         if (!EMAIL_USER || !EMAIL_PASS) {
             console.log("Missing EMAIL_USER or EMAIL_PASS in environment variables, skipping email send");
