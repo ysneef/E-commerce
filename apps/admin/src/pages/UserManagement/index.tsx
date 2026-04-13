@@ -1,4 +1,4 @@
-import { DeleteOutlined, PlusOutlined } from "@ant-design/icons"
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons"
 import { Avatar, Button, Table, Tag, Tooltip, notification, Popconfirm } from "antd"
 import moment from "moment"
 import { useState } from "react"
@@ -36,6 +36,7 @@ const UserManagement = () => {
   const [isAdding, setIsAdding] = useState(false)
   const [openForm, setOpenForm] = useState(false)
   const [loadingAction, setLoadingAction] = useState(false);
+  const [editingUser, setEditingUser] = useState<TUser | null>(null);
 
 
   const handleSearch = (values: any) => {
@@ -52,8 +53,13 @@ const UserManagement = () => {
   const handleAddUser = async (values: any) => {
     try {
       setIsAdding(true);
-      const response = await UserApi.createUser(values);
-      console.log("🚀 ~ handleAddUser ~ response:", response)
+      
+      let response;
+      if (editingUser) {
+        response = await UserApi.updateUser(editingUser._id, values);
+      } else {
+        response = await UserApi.createUser(values);
+      }
 
       if (!response.success) {
         api.error({
@@ -65,10 +71,11 @@ const UserManagement = () => {
 
       api.success({
         message: "Success",
-        description: "User added successfully!",
+        description: editingUser ? "User updated successfully!" : "User added successfully!",
       });
 
       setOpenForm(false);
+      setEditingUser(null);
       retry();
     } catch (error) {
       console.log("🚀 ~ handleAddUser ~ error:", error);
@@ -171,26 +178,40 @@ const UserManagement = () => {
     {
       title: "Action",
       key: "action",
-      width: 100,
+      width: 120,
       fixed: "right",
       render: (_: any, record: TUser) => (
-        <Popconfirm
-          title="Delete user"
-          description="Are you sure you want to delete this user?"
-          onConfirm={() => handleDeleteUser(record._id)}
-          okText="Yes"
-          cancelText="No"
-        >
-          <Tooltip title="Delete">
+        <div className="flex gap-2">
+           <Tooltip title="Edit">
             <Button
               type="primary"
-              danger
-              icon={<DeleteOutlined />}
+              icon={<EditOutlined />}
               size="small"
-              loading={loadingAction}
+              onClick={() => {
+                setEditingUser(record);
+                setOpenForm(true);
+              }}
             />
           </Tooltip>
-        </Popconfirm>
+
+          <Popconfirm
+            title="Delete user"
+            description="Are you sure you want to delete this user?"
+            onConfirm={() => handleDeleteUser(record._id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Tooltip title="Delete">
+              <Button
+                type="primary"
+                danger
+                icon={<DeleteOutlined />}
+                size="small"
+                loading={loadingAction}
+              />
+            </Tooltip>
+          </Popconfirm>
+        </div>
       ),
     },
   ]
@@ -236,7 +257,10 @@ const UserManagement = () => {
       />
       <InfoList
         right={
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpenForm(true)}>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => {
+            setEditingUser(null);
+            setOpenForm(true);
+          }}>
             Add
           </Button>
         }
@@ -262,10 +286,17 @@ const UserManagement = () => {
       />
       <AddUser
         visible={openForm}
+        initialValues={editingUser}
         onSubmit={handleAddUser} 
-        onCancel={() => setOpenForm(false)} 
+        onCancel={() => {
+          setOpenForm(false);
+          setEditingUser(null);
+        }} 
         loading={isAdding}
-        onClose={() => setOpenForm(false)}
+        onClose={() => {
+          setOpenForm(false);
+          setEditingUser(null);
+        }}
       />
       {contextHolder}
     </div>

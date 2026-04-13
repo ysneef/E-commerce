@@ -1,6 +1,6 @@
 import { UserOutlined } from "@ant-design/icons";
 import { Avatar, message, Upload } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { uploadImageToCloudinary } from "../../../../../../Utils/Funtions";
 
 interface FormAvatarUploadProps {
@@ -11,6 +11,10 @@ interface FormAvatarUploadProps {
 
 const FormAvatarUpload: React.FC<FormAvatarUploadProps> = ({ onChange, onUploadingChange, value=null }) => {
   const [imageUrl, setImageUrl] = useState<string | null>(value);
+
+  useEffect(() => {
+    setImageUrl(value);
+  }, [value]);
 
   const beforeUpload = (file: File) => {
     if (!file.type.startsWith("image/")) {

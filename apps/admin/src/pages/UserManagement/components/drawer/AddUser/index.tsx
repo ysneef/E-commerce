@@ -8,14 +8,17 @@ type AddUserProps = {
   onClose: () => void;
   loading?: boolean;
   visible: boolean;
+  initialValues?: any;
 };
 
 export type AddUserValues = {
   userName: string;
   email: string;
-  password: string;
+  password?: string;
   address: string;
   role: string;
+  avatar?: string;
+  phone?: string;
 };
 
 const AddUser: React.FC<AddUserProps> = ({
@@ -24,6 +27,7 @@ const AddUser: React.FC<AddUserProps> = ({
   loading,
   visible,
   onClose,
+  initialValues,
 }) => {
   const [form] = Form.useForm();
   const [uploading, setUploading] = useState(false);
@@ -40,13 +44,17 @@ const AddUser: React.FC<AddUserProps> = ({
 
   useEffect(() => {
     if (visible) {
-      form.resetFields();
+      if (initialValues) {
+        form.setFieldsValue(initialValues);
+      } else {
+        form.resetFields();
+      }
     }
-  }, [visible]);
+  }, [visible, initialValues, form]);
 
   return (
     <Drawer
-      title="Add User"
+      title={initialValues ? "Edit User" : "Add User"}
       placement="right"
       width={400}
       open={visible}
@@ -67,15 +75,20 @@ const AddUser: React.FC<AddUserProps> = ({
             name="password"
             rules={[
                 {
-                    required: true, message: "Please enter the password!",
+                    required: !initialValues, 
+                    message: "Please enter the password!",
                     validator: (_, value) => {
-                        if (!value || value.length >= 6) return Promise.resolve();
+                        if (!value) {
+                          if (initialValues) return Promise.resolve();
+                          return Promise.reject("Please enter the password!");
+                        }
+                        if (value.length >= 6) return Promise.resolve();
                         return Promise.reject("Password must be at least 6 characters!");
                     },
                 },
             ]}
         >
-          <Input.Password placeholder="Enter password" />
+          <Input.Password placeholder={initialValues ? "Leave blank to keep current password" : "Enter password"} />
         </Form.Item>
 
         <Form.Item
@@ -139,7 +152,7 @@ const AddUser: React.FC<AddUserProps> = ({
             htmlType="submit"
             loading={loading || uploading}
           >
-            Add
+            {initialValues ? "Update" : "Add"}
           </Button>
         </div>
       </Form>
