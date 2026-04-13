@@ -98,10 +98,18 @@ const Login: React.FC = () => {
             <Button type="primary" htmlType="submit" className="w-full">
               Login
             </Button>
-            {/* <Button type="primary" className="w-full" onClick={test}>
-                    Get
-                </Button> */}
           </Form.Item>
+
+          <div className="text-center text-sm text-gray-500 mt-2">
+            Don't have an account?{" "}
+            <span
+              className="text-blue-500 hover:underline cursor-pointer font-medium"
+              onClick={() => navigate("/register")}
+            >
+              Register now
+            </span>
+          </div>
+
         </Form>
       </Card>
       {contextHolder}
