@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { formatNumber } from '@repo/ui';
 import { Avatar, Badge, Button, Dropdown, Menu, Select, Spin } from 'antd';
 import { debounce } from 'lodash';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ClientApi } from '../../api/apiRequest';
@@ -19,34 +19,46 @@ function Header() {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [suggestions, setSuggestions] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  
   const user = useSelector((state: RootState) => state.user);
-  console.log("🚀 ~ Header ~ user:", user)
   const location = useLocation();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleSearch = debounce(async(value: string) => {
-    if (value === searchTerm) return; 
-    setSearchTerm(value);
-    setIsLoading(true);
-    try {
-      const products = await ProductApi.searchProducts({
-        page: 1,
-        pageSize: 4,
-        freeText: value
-      })
-      
-      setSuggestions(products.data || []);
-    } catch (err) {
-      console.error('Search failed:', err);
-      setSuggestions([]);
-    } finally {
-      setIsLoading(false);
-    }
-  },500);
+  // Debounced API call for suggestions
+  const fetchSuggestions = useCallback(
+    debounce(async (value: string) => {
+      if (!value.trim()) {
+        setSuggestions([]);
+        return;
+      }
+      setIsLoading(true);
+      try {
+        const products = await ProductApi.searchProducts({
+          page: 1,
+          pageSize: 4,
+          freeText: value
+        });
+        setSuggestions(products.data || []);
+      } catch (err) {
+        console.error('Search failed:', err);
+        setSuggestions([]);
+      } finally {
+        setIsLoading(false);
+      }
+    }, 500),
+    []
+  );
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value); // Update UI immediately
+    fetchSuggestions(value); // Search with debounce
+  };
 
   const handleSelect = (productId: string) => {
-    navigate(`/product?id=${productId}`)
+    setSearchTerm(''); // Clear on select
+    setSuggestions([]);
+    navigate(`/product?id=${productId}`);
   };
 
   const handleMenuClick = async (e: any) => {
@@ -64,7 +76,6 @@ function Header() {
         });
         if (response?.data?.success) {
           dispatch(clearUser())
-          
         }
       } catch (err) {
         console.error('Logout failed:', err);
@@ -102,11 +113,15 @@ function Header() {
               allowClear
               className="w-full sm:w-[300px] rounded-full"
               placeholder="Search for products"
-              value={searchTerm}
+              value={searchTerm || undefined}
               onSearch={handleSearch}
               onSelect={handleSelect}
               notFoundContent={isLoading ? <Spin size="small" /> : null}
               filterOption={false}
+              onClear={() => {
+                setSearchTerm('');
+                setSuggestions([]);
+              }}
             >
               {suggestions.map((product) => (
                 <Select.Option key={product._id} value={product._id} label={product.name}>
