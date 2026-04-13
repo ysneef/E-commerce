@@ -126,6 +126,17 @@ function Register() {
               Register
             </Button>
           </Form.Item>
+
+          <div className="text-center text-sm text-gray-500 mt-2">
+            Already have an account?{" "}
+            <span
+              className="text-blue-500 hover:underline cursor-pointer font-medium"
+              onClick={() => navigate("/login")}
+            >
+              Login now
+            </span>
+          </div>
+
         </Form>
       </Card>
       {contextHolder}
